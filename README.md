@@ -76,7 +76,7 @@ The entry point of the library is the `CldAndroid` object. `CldAndroid.init()` m
 Here's an example of setting the configuration parameters programmatically in your `Applicaion.onCreate(`:
     
      Map config = new HashMap();
-     config.put("cloud_name", "n07t21i7");
+     config.put("cloud_name", "myCloudName");
      CldAndroid.init(this, config);
     
 Alternatively, When using the meta-data property, no configuration is required:
@@ -89,9 +89,11 @@ The added property `AndroidManifest.xml`. Note: You should only include the `clo
         ...
         <application>
             ...
-            <meta-data android:name="CLOUDINARY_URL" android:value="cloudinary://@n07t21i7"/>
+            <meta-data android:name="CLOUDINARY_URL" android:value="cloudinary://@myCloudName"/>
         </application>
     <manifest>
+
+
 
 ### Embedding and transforming images
 
@@ -186,6 +188,7 @@ where you should implement the call to your server's signing endpoint. This call
         }
     }, null);
         
+
 ## Additional resources ##########################################################
 
 Additional resources are available at:
