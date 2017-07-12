@@ -7,16 +7,7 @@
         android:id="@+id/image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/ic_launcher"
         android:scaleType="centerCrop" />
-
-    <ImageView
-        android:id="@+id/syncCheckmark"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="8dp"
-        android:src="@drawable/checkmark"
-        android:visibility="gone" />
 
 </RelativeLayout>

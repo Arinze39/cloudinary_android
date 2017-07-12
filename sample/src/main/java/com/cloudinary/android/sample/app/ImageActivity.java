@@ -22,7 +22,7 @@ import com.cloudinary.Transformation;
 import com.cloudinary.android.CldAndroid;
 import com.cloudinary.android.sample.R;
 import com.cloudinary.android.sample.core.CloudinaryHelper;
-import com.cloudinary.android.sample.model.Image;
+import com.cloudinary.android.sample.model.Resource;
 import com.cloudinary.android.sample.widget.GridDividerItemDecoration;
 import com.cloudinary.transformation.TextLayer;
 import com.cloudinary.utils.StringUtils;
@@ -39,7 +39,7 @@ public class ImageActivity extends AppCompatActivity {
     private static final int SPAN = 3;
     private ImageView imageView;
     private Button uploadedButton;
-    private Image image;
+    private Resource resource;
     private RecyclerView recyclerView;
     private int thumbSize;
 
@@ -56,7 +56,7 @@ public class ImageActivity extends AppCompatActivity {
         uploadedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResult(RESULT_OK, new Intent(ACTION_UPLOAD).putExtra(IMAGE_INTENT_EXTRA, image));
+                setResult(RESULT_OK, new Intent(ACTION_UPLOAD).putExtra(IMAGE_INTENT_EXTRA, resource));
                 finish();
             }
         });
@@ -83,7 +83,7 @@ public class ImageActivity extends AppCompatActivity {
             public boolean onPreDraw() {
                 recyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
                 thumbSize = Math.round((float) (recyclerView.getWidth() + dividerSize) / SPAN) - dividerSize;
-                List<String> urls = generateUrls(thumbSize, image.getCloudinaryPublicId());
+                List<String> urls = generateUrls(thumbSize, resource.getCloudinaryPublicId());
                 int height = (thumbSize + dividerSize) * (urls.size() / SPAN + urls.size() % SPAN) - dividerSize;
                 recyclerView.getLayoutParams().height = height;
                 recyclerView.setAdapter(new EffectsGalleryAdapter(ImageActivity.this, urls, thumbSize));
@@ -138,11 +138,11 @@ public class ImageActivity extends AppCompatActivity {
             finish();
         }
 
-        image = (Image) intent.getSerializableExtra(IMAGE_INTENT_EXTRA);
+        resource = (Resource) intent.getSerializableExtra(IMAGE_INTENT_EXTRA);
 
-        String cloudinaryPublicId = image.getCloudinaryPublicId();
+        String cloudinaryPublicId = resource.getCloudinaryPublicId();
         if (StringUtils.isEmpty(cloudinaryPublicId)) {
-            Picasso.with(this).load(image.getLocalUri()).placeholder(R.drawable.ic_launcher).into(imageView);
+            Picasso.with(this).load(resource.getLocalUri()).placeholder(R.drawable.ic_launcher).into(imageView);
             uploadedButton.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
@@ -168,7 +168,7 @@ public class ImageActivity extends AppCompatActivity {
 
                 @Override
                 public void onError() {
-                    showSnackBar("Error loading image");
+                    showSnackBar("Error loading resource");
                 }
             });
             recyclerView.setVisibility(View.VISIBLE);

@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -30,7 +29,7 @@ class EffectsGalleryAdapter extends RecyclerView.Adapter<EffectsGalleryAdapter.I
 
     @Override
     public EffectsGalleryAdapter.ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image, parent, false);
+        ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_effects_gallery, parent, false);
         viewGroup.getLayoutParams().height = requiredSize;
         viewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,14 +47,7 @@ class EffectsGalleryAdapter extends RecyclerView.Adapter<EffectsGalleryAdapter.I
     public void onBindViewHolder(final EffectsGalleryAdapter.ImageViewHolder holder, int position) {
         String image = images.get(position);
         holder.itemView.setTag(image);
-        Picasso.with(context).load(image).placeholder(R.drawable.ic_launcher).into(holder.imageView);
-        holder.imageView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                holder.imageView.getViewTreeObserver().removeOnPreDrawListener(this);
-                return true;
-            }
-        });
+        Picasso.with(context).load(image).into(holder.imageView);
     }
 
     @Override
