@@ -39,11 +39,11 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         pendingResults = new ConcurrentHashMap<>();
         initListenerClass(context);
         readWriteLock = new ReentrantReadWriteLock();
-        HandlerThread handlerThread = new HandlerThread("Callbacks"); // REVIEW remove
+        HandlerThread handlerThread = new HandlerThread("Callbacks");
         handlerThread.start();
 
         // Handler for all callback calls (NOT on main thread).
-//        handler = new Handler(handlerThread.getLooper()) { // REVIEW delete?
+//        handler = new Handler(handlerThread.getLooper()) {
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
@@ -78,6 +78,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void registerCallback(String requestId, UploadCallback callback) {
         readWriteLock.writeLock().lock();
