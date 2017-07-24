@@ -249,7 +249,7 @@ public class CldAndroid {
 
     /***
      * Setup the global upload policy for Cloudinary.
-     * @param globalUploadPolicy The policy to set. See {@link RequestUploadPolicy.Builder}.
+     * @param globalUploadPolicy The policy to set. See {@link UploadPolicy.Builder}.
      * */
     public void setGlobalUploadPolicy(GlobalUploadPolicy globalUploadPolicy) {
         this.globalUploadPolicy = globalUploadPolicy;

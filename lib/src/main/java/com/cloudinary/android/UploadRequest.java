@@ -18,7 +18,7 @@ public class UploadRequest<T extends Payload> {
     private final UploadContext<T> uploadContext;
     private String requestId;
     private boolean dispatched = false;
-    private RequestUploadPolicy requestUploadPolicy = CldAndroid.get().getGlobalUploadPolicy();
+    private UploadPolicy uploadPolicy = CldAndroid.get().getGlobalUploadPolicy();
     private TimeWindow timeWindow = TimeWindow.getDefault();
     private UploadCallback callback;
     private Map<String, Object> options;
@@ -91,13 +91,13 @@ public class UploadRequest<T extends Payload> {
     }
 
     /***
-     * Set the upload requestUploadPolicy for the request
-     * @param policy The requestUploadPolicy to set. See {@link RequestUploadPolicy.Builder}
+     * Set the upload uploadPolicy for the request
+     * @param policy The uploadPolicy to set. See {@link UploadPolicy.Builder}
      * @return This request for chaining.
      */
-    public synchronized UploadRequest<T> policy(RequestUploadPolicy policy) {
+    public synchronized UploadRequest<T> policy(UploadPolicy policy) {
         assertNotDispatched();
-        this.requestUploadPolicy = policy;
+        this.uploadPolicy = policy;
         return this;
     }
 
@@ -152,8 +152,8 @@ public class UploadRequest<T extends Payload> {
         return optionsAsString;
     }
 
-    RequestUploadPolicy getRequestUploadPolicy() {
-        return requestUploadPolicy;
+    UploadPolicy getUploadPolicy() {
+        return uploadPolicy;
     }
 
     void defferByMinutes(int minutes) {
@@ -163,7 +163,7 @@ public class UploadRequest<T extends Payload> {
     void populateParamsFromFields(ParamsAdaptable target) {
         target.putString("uri", getPayload().toUri());
         target.putString("requestId", getRequestId());
-        target.putInt("maxErrorRetries", getRequestUploadPolicy().getMaxErrorRetries());
+        target.putInt("maxErrorRetries", getUploadPolicy().getMaxErrorRetries());
         target.putString("options", getOptionsString());
     }
 

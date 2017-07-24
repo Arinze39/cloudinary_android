@@ -20,7 +20,7 @@ class AndroidJobStrategy implements BackgroundRequestStrategy {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         request.populateParamsFromFields(new AndroidJobParamsAdaptable(extras));
 
-        RequestUploadPolicy policy = request.getRequestUploadPolicy();
+        UploadPolicy policy = request.getUploadPolicy();
 
         return new JobRequest.Builder(JOB_TAG)
                 .setExecutionWindow(request.getTimeWindow().getMinLatencyOffsetMillis(), request.getTimeWindow().getMaxExecutionDelayMillis())
@@ -34,7 +34,7 @@ class AndroidJobStrategy implements BackgroundRequestStrategy {
                 .build();
     }
 
-    private static JobRequest.BackoffPolicy adaptPolicy(RequestUploadPolicy.BackoffPolicy backoffPolicy) {
+    private static JobRequest.BackoffPolicy adaptPolicy(UploadPolicy.BackoffPolicy backoffPolicy) {
         switch (backoffPolicy) {
             case LINEAR:
                 return JobRequest.BackoffPolicy.LINEAR;
@@ -44,7 +44,7 @@ class AndroidJobStrategy implements BackgroundRequestStrategy {
         }
     }
 
-    private static JobRequest.NetworkType adaptNetworkType(RequestUploadPolicy.NetworkType networkType) {
+    private static JobRequest.NetworkType adaptNetworkType(UploadPolicy.NetworkType networkType) {
         switch (networkType) {
             case NONE:
                 return JobRequest.NetworkType.ANY;

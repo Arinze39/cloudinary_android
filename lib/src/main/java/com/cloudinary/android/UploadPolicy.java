@@ -3,8 +3,8 @@ package com.cloudinary.android;
 /***
  * Represents the set of conditions that must be met for a request to execute. Note: A request will be executed regardless of policy once the {@link TimeWindow} expires.
  */
-public class RequestUploadPolicy {
-    private static String TAG = "RequestUploadPolicy";
+public class UploadPolicy {
+    private static String TAG = "UploadPolicy";
 
     private static final int DEFAULT_MAX_ERROR_RETRIES = 5;
     private static final long DEFAULT_BACKOFF_MILLIS = 120_000;
@@ -18,9 +18,9 @@ public class RequestUploadPolicy {
     private final BackoffPolicy backoffPolicy;
 
     /***
-     * Use {@link Builder} to configure and get an instance of {@link RequestUploadPolicy}.
+     * Use {@link Builder} to configure and get an instance of {@link UploadPolicy}.
      */
-    protected RequestUploadPolicy(NetworkType networkType, boolean requiresCharging, boolean requiresIdle, int maxErrorRetries, long backoffMillis, BackoffPolicy backoffPolicy) {
+    protected UploadPolicy(NetworkType networkType, boolean requiresCharging, boolean requiresIdle, int maxErrorRetries, long backoffMillis, BackoffPolicy backoffPolicy) {
         this.networkType = networkType;
         this.requiresCharging = requiresCharging;
         this.requiresIdle = requiresIdle;
@@ -58,9 +58,9 @@ public class RequestUploadPolicy {
     }
 
     /***
-     * @return An instance of {@link RequestUploadPolicy} get the default configuration.
+     * @return An instance of {@link UploadPolicy} get the default configuration.
      */
-    public static RequestUploadPolicy defaultPolicy() {
+    public static UploadPolicy defaultPolicy() {
         return new Builder().build();
     }
 
@@ -85,7 +85,7 @@ public class RequestUploadPolicy {
     }
 
     /***
-     * Base class for {@link RequestUploadPolicy} builders.
+     * Base class for {@link UploadPolicy} builders.
      */
     abstract static class BaseBuilder<T extends BaseBuilder> {
         NetworkType networkPolicy = NetworkType.ANY;
@@ -147,15 +147,15 @@ public class RequestUploadPolicy {
         }
 
         /***
-         * @return An instance of {@link RequestUploadPolicy} get the requested configuration.
+         * @return An instance of {@link UploadPolicy} get the requested configuration.
          */
-        public RequestUploadPolicy build() {
-            return new RequestUploadPolicy(networkPolicy, requiresCharging, requiresIdle, maxRetries, backoffMillis, backoffPolicy);
+        public UploadPolicy build() {
+            return new UploadPolicy(networkPolicy, requiresCharging, requiresIdle, maxRetries, backoffMillis, backoffPolicy);
         }
     }
 
     /***
-     * A utility class to construct an instance of {@link RequestUploadPolicy}.
+     * A utility class to construct an instance of {@link UploadPolicy}.
      */
     public static class Builder extends BaseBuilder<Builder>{
     }
