@@ -33,21 +33,21 @@ public class CldAndroid {
     private final com.cloudinary.Cloudinary cloudinary;
     private final RequestDispatcherInterface requestDispatcher;
     private final RequestProcessorInterface requestProcessor;
-    private final CallbackDispatcher callbackDispatcher;
+    private final DefaultCallbackDispatcher callbackDispatcher; //REVIEW why not using interface
     private final BackgroundRequestStrategy strategy;
     private final SignatureProvider signatureProvider;
     private final UploadCallback callback;
 
     private GlobalUploadPolicy globalUploadPolicy = GlobalUploadPolicy.defaultPolicy();
 
-    private CldAndroid(@NonNull Context context, @Nullable SignatureProvider provider, @Nullable Map<String, Object> config) {
+    private CldAndroid(@NonNull Context context, @Nullable SignatureProvider signatureProvider, @Nullable Map<String, Object> config) {
         // use context to initialize components but DO NOT store it
         strategy = BackgroundStrategyProvider.provideStrategy();
-        callbackDispatcher = new CallbackDispatcher(context);
+        callbackDispatcher = new DefaultCallbackDispatcher(context);
         requestDispatcher = new RequestDispatcher(strategy);
         requestProcessor = new RequestProcessor(callbackDispatcher);
         strategy.init(context);
-        this.signatureProvider = provider;
+        this.signatureProvider = signatureProvider;
 
         String cloudinaryUrl = Utils.cloudinaryUrlFromContext(context);
         if (config != null) {
@@ -107,10 +107,10 @@ public class CldAndroid {
     /***
      * Setup the library with the required parameters. A flavor of init() must be called once before CldAndroid can be used, preferably in an implementation of {@link Application#onCreate()}.
      * @param context Android context for initializations. Does not get cached.
-     * @param provider A signature provider. Needed if using signed uploads.
+     * @param signatureProvider A signature provider. Needed if using signed uploads.
      */
-    public static void init(@NonNull Context context, @Nullable SignatureProvider provider) {
-        init(context, provider, null);
+    public static void init(@NonNull Context context, @Nullable SignatureProvider signatureProvider) {
+        init(context, signatureProvider, null);
     }
 
     /***

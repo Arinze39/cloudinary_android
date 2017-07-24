@@ -22,7 +22,7 @@ public class CallbackDispatcherTest {
     @Test
     public void testCallbacks() throws InterruptedException {
         Context appContext = InstrumentationRegistry.getTargetContext();
-        CallbackDispatcherInterface dispatcher = new CallbackDispatcher(appContext);
+        CallbackDispatcher dispatcher = new DefaultCallbackDispatcher(appContext);
         CallbackCounter callbackCounter = new CallbackCounter();
         dispatcher.registerCallback(callbackCounter);
 
@@ -67,7 +67,7 @@ public class CallbackDispatcherTest {
     @Test
     public void testQueuedResults() throws InterruptedException {
         Context appContext = InstrumentationRegistry.getTargetContext();
-        CallbackDispatcherInterface dispatcher = new CallbackDispatcher(appContext);
+        CallbackDispatcher dispatcher = new DefaultCallbackDispatcher(appContext);
 
         dispatcher.dispatchSuccess(appContext, "a", Collections.singletonMap("test1", "result1"));
         dispatcher.dispatchSuccess(appContext, "b", Collections.singletonMap("test2", "result2"));

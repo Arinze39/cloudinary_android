@@ -23,10 +23,10 @@ import static com.cloudinary.android.UploadStatus.SUCCESS;
 
 class RequestProcessor implements RequestProcessorInterface {
     private static final String TAG = "RequestProcessor";
-    private final CallbackDispatcherInterface callbackDispatcher;
+    private final CallbackDispatcher callbackDispatcher;
     private AtomicInteger runningJobs = new AtomicInteger(0);
 
-    RequestProcessor(CallbackDispatcherInterface callbackDispatcher) {
+    RequestProcessor(CallbackDispatcher callbackDispatcher) {
         this.callbackDispatcher = callbackDispatcher;
     }
 
@@ -133,7 +133,7 @@ class RequestProcessor implements RequestProcessorInterface {
             callbackDispatcher.dispatchReschedule(context, requestId, error);
         }
 
-        Logger.i(TAG, String.format("Finished processing request %s, result: ", requestId, requestResultStatus));
+        Logger.i(TAG, String.format("Finished processing request %s, result: %s", requestId, requestResultStatus));
 
         return requestResultStatus;
     }
@@ -184,13 +184,13 @@ class RequestProcessor implements RequestProcessorInterface {
 
     private static final class ProcessorCallback implements ProgressCallback {
         final long notifyThrottlingStepSize;
-        private final CallbackDispatcherInterface dispatcher;
+        private final CallbackDispatcher dispatcher;
         long bytesNotified;
         long bytesUploaded;
         long totalBytes;
         String requestId;
 
-        ProcessorCallback(long totalBytes, long offset, CallbackDispatcherInterface dispatcher, final String requestId) {
+        ProcessorCallback(long totalBytes, long offset, CallbackDispatcher dispatcher, final String requestId) {
             // calculate step size for progress - prevent flooding the user with callbacks.
             this.notifyThrottlingStepSize = totalBytes > 0 ? totalBytes / 100 : 500 * 1024 * 1024;
             this.totalBytes = totalBytes;
