@@ -1,4 +1,4 @@
-package com.cloudinary.android;
+package com.cloudinary.android.sample.app;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

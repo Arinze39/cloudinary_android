@@ -14,6 +14,7 @@ import com.cloudinary.android.sample.R;
 import com.cloudinary.android.sample.model.Resource;
 import com.cloudinary.android.sample.widget.GridDividerItemDecoration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractPagerFragment extends Fragment {
@@ -103,5 +104,9 @@ public abstract class AbstractPagerFragment extends Fragment {
 
     public RecyclerView getRecyclerView() {
         return recyclerView;
+    }
+
+    public void clearData() {
+        ((ResourcesAdapter) recyclerView.getAdapter()).replaceImages(new ArrayList<Resource>());
     }
 }

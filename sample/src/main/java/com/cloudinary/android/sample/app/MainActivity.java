@@ -26,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.cloudinary.android.CldAndroid;
-import com.cloudinary.android.DeleteImageDialogFragment;
 import com.cloudinary.android.sample.R;
 import com.cloudinary.android.sample.core.CloudinaryHelper;
 import com.cloudinary.android.sample.model.Resource;
@@ -142,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements ResourcesAdapter.
             case R.id.menu_clear:
                 clearLocalImages();
                 for (AbstractPagerFragment fragment : getPages()) {
-                    fragment.getData();
+                    fragment.clearData();
                 }
                 return true;
             case R.id.menu_upload:
@@ -236,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements ResourcesAdapter.
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         intent.setType("image/*");
+//        intent.setType("video/*");
         startActivityForResult(intent, CHOOSE_IMAGE_REQUEST_CODE);
     }
 
