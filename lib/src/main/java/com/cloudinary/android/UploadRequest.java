@@ -160,7 +160,7 @@ public class UploadRequest<T extends Payload> {
         timeWindow = timeWindow.newDeferredWindow(minutes);
     }
 
-    void populateParamsFromFields(ParamsAdaptable target) {
+    void populateParamsFromFields(RequestParams target) {
         target.putString("uri", getPayload().toUri());
         target.putString("requestId", getRequestId());
         target.putInt("maxErrorRetries", getUploadPolicy().getMaxErrorRetries());

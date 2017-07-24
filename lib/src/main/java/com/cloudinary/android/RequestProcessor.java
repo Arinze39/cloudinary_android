@@ -30,7 +30,7 @@ class RequestProcessor implements RequestProcessorInterface {
         this.callbackDispatcher = callbackDispatcher;
     }
 
-    public UploadStatus processRequest(Context context, ParamsAdaptable params) {
+    public UploadStatus processRequest(Context context, RequestParams params) {
 
         final String requestId = params.getString("requestId", null);
         final String uri = params.getString("uri", null);
@@ -138,7 +138,7 @@ class RequestProcessor implements RequestProcessorInterface {
         return requestResultStatus;
     }
 
-    private Map doProcess(final String requestId, Context appContext, Map<String, Object> options, ParamsAdaptable params, Payload payload) throws NotFoundException, IOException {
+    private Map doProcess(final String requestId, Context appContext, Map<String, Object> options, RequestParams params, Payload payload) throws NotFoundException, IOException {
         Logger.d(TAG, String.format("Starting upload for request %s", requestId));
         runningJobs.incrementAndGet();
         final long actualTotalBytes = payload.getLength(appContext);

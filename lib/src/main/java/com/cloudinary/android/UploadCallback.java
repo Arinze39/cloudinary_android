@@ -29,7 +29,7 @@ public interface UploadCallback {
     void onSuccess(String requestId,Map resultData);
 
     /***
-     * Called when a request encounteres an error.
+     * Called when a request encounters an error.
      * @param requestId Id of the request sending this callback.
      * @param error Error description
      */

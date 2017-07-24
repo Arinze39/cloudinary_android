@@ -18,7 +18,7 @@ class AndroidJobStrategy implements BackgroundRequestStrategy {
 
     static JobRequest adapt(UploadRequest request) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
-        request.populateParamsFromFields(new AndroidJobParamsAdaptable(extras));
+        request.populateParamsFromFields(new AndroidJobRequestParams(extras));
 
         UploadPolicy policy = request.getUploadPolicy();
 
@@ -177,7 +177,7 @@ class AndroidJobStrategy implements BackgroundRequestStrategy {
             wl.acquire();
             try {
                 // call the generic processor:
-                UploadStatus result = CldAndroid.get().processRequest(getContext(), new AndroidJobParamsAdaptable(params.getExtras()));
+                UploadStatus result = CldAndroid.get().processRequest(getContext(), new AndroidJobRequestParams(params.getExtras()));
                 return adaptResult(result);
             } finally {
                 wl.release();
@@ -185,10 +185,10 @@ class AndroidJobStrategy implements BackgroundRequestStrategy {
         }
     }
 
-    private static final class AndroidJobParamsAdaptable implements ParamsAdaptable {
+    private static final class AndroidJobRequestParams implements RequestParams {
         private final PersistableBundleCompat bundle;
 
-        private AndroidJobParamsAdaptable(PersistableBundleCompat bundle) {
+        private AndroidJobRequestParams(PersistableBundleCompat bundle) {
             this.bundle = bundle;
         }
 

@@ -300,7 +300,7 @@ public class CldAndroid {
      * Process a single request, this runs after verifying all the policies and conditions are met. For internal use.
      * @param context Android context.
      */
-    UploadStatus processRequest(Context context, ParamsAdaptable params) {
+    UploadStatus processRequest(Context context, RequestParams params) {
         return requestProcessor.processRequest(context, params);
     }
 
