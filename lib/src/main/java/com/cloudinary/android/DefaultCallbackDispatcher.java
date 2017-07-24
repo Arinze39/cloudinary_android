@@ -78,6 +78,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void registerCallback(String requestId, UploadCallback callback) {
         readWriteLock.writeLock().lock();

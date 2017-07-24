@@ -57,7 +57,7 @@ public class UploaderStrategy extends AbstractUploaderStrategy {
                 params.put("api_key", apiKey);
             }
         } else {
-            // Nothing to do
+            // Nothing to do // REVIEW then why bother?
         }
 
         String apiUrl = buildUploadUrl(action, options);

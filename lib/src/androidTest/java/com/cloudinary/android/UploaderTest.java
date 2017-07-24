@@ -398,7 +398,7 @@ public class UploaderTest extends AbstractTest {
             cloudinary.uploader().upload(getAssetStream(TEST_IMAGE), ObjectUtils.asMap("auto_tagging", 0.5f));
         } catch (Exception e) {
             for (int i = 0; i < e.getStackTrace().length; i++) {
-                StackTraceElement x = e.getStackTrace()[i];
+                StackTraceElement x = e.getStackTrace()[i]; // REVIEW what does this do?
             }
             assertTrue(e.getMessage().matches("^Must use(.*)"));
         }

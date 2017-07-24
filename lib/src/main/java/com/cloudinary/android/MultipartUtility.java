@@ -54,7 +54,7 @@ public class MultipartUtility {
             }
         }
         httpConn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-        httpConn.setRequestProperty("User-Agent", USER_AGENT);
+        httpConn.setRequestProperty("User-Agent", USER_AGENT); // REVIEW add more details
         outputStream = httpConn.getOutputStream();
         writer = new PrintWriter(new OutputStreamWriter(outputStream, charset), true);
     }
