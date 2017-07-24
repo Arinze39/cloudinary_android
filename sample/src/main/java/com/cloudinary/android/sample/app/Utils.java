@@ -5,10 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.view.WindowManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,5 +76,12 @@ public class Utils {
         }
 
         return inSampleSize;
+    }
+
+    public static int getScreenWidth(Context context) {
+        WindowManager window = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Point point = new Point();
+        window.getDefaultDisplay().getSize(point);
+        return point.x;
     }
 }
