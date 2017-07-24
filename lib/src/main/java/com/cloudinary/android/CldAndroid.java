@@ -32,7 +32,7 @@ public class CldAndroid {
 
     private final com.cloudinary.Cloudinary cloudinary;
     private final RequestDispatcherInterface requestDispatcher;
-    private final RequestProcessorInterface requestProcessor;
+    private final RequestProcessor requestProcessor;
     private final DefaultCallbackDispatcher callbackDispatcher; //REVIEW why not using interface
     private final BackgroundRequestStrategy strategy;
     private final SignatureProvider signatureProvider;
@@ -45,7 +45,7 @@ public class CldAndroid {
         strategy = BackgroundStrategyProvider.provideStrategy();
         callbackDispatcher = new DefaultCallbackDispatcher(context);
         requestDispatcher = new RequestDispatcher(strategy);
-        requestProcessor = new RequestProcessor(callbackDispatcher);
+        requestProcessor = new DefaultRequestProcessor(callbackDispatcher);
         strategy.init(context);
         this.signatureProvider = signatureProvider;
 
