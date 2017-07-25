@@ -9,7 +9,7 @@ import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
 
-/***
+/**
  * Background work strategy implementation based on com.evernote.android.job
  */
 class AndroidJobStrategy implements BackgroundRequestStrategy {

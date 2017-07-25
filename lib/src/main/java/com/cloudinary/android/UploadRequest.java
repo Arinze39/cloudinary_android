@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/***
+/**
  * A request to upload a single {@link Payload} to Cloudinary.
  * @param <T> The payload type this request will upload
  */
@@ -40,7 +40,7 @@ public class UploadRequest<T extends Payload> {
         this.requestId = requestId;
     }
 
-    /***
+    /**
      * Setup a callback to get notified on upload events.
      * @return This request for chaining.
      */
@@ -58,7 +58,7 @@ public class UploadRequest<T extends Payload> {
         return this;
     }
 
-    /***
+    /**
      * Constrain this request to run within a specific {@link TimeWindow}.
      * @return This request for chaining.
      */
@@ -68,7 +68,7 @@ public class UploadRequest<T extends Payload> {
         return this;
     }
 
-    /***
+    /**
      * Set a map of options for this request. Note: This replaces any existing options.
      * @return This request for chaining.
      */
@@ -77,7 +77,7 @@ public class UploadRequest<T extends Payload> {
         return this;
     }
 
-    /***
+    /**
      * Add an option to this request.
      * @param name Option name.
      * @param value Option value.
@@ -90,7 +90,7 @@ public class UploadRequest<T extends Payload> {
         return this;
     }
 
-    /***
+    /**
      * Set the upload uploadPolicy for the request
      * @param policy The uploadPolicy to set. See {@link UploadPolicy.Builder}
      * @return This request for chaining.
@@ -101,7 +101,7 @@ public class UploadRequest<T extends Payload> {
         return this;
     }
 
-    /***
+    /**
      * Dispatch the request
      * @return The unique id of the request.
      */
@@ -167,7 +167,7 @@ public class UploadRequest<T extends Payload> {
         target.putString("options", getOptionsString());
     }
 
-    /***
+    /**
      * Wraps the delegate and unregisters the callback once a request is finished.
      */
     private static final class DelegateCallback implements UploadCallback {

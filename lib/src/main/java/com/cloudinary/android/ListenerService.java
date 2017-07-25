@@ -8,7 +8,7 @@ import com.cloudinary.utils.StringUtils;
 import static com.cloudinary.android.UploadStatus.FAILURE;
 import static com.cloudinary.android.UploadStatus.SUCCESS;
 
-/***
+/**
  * Build a service derived from this class to receive request callback when the application is in the background.
  * Note: The concrete service class should be registered in the manifest twice, once like any other service (under application/service tag)
  * and once for cloudinary metadata like so:
