@@ -5,11 +5,14 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.util.Pools;
 
+import com.cloudinary.android.callback.ListenerService;
+import com.cloudinary.android.callback.UploadCallback;
+import com.cloudinary.android.callback.UploadResult;
+import com.cloudinary.android.callback.UploadStatus;
 import com.cloudinary.utils.StringUtils;
 
 import java.util.HashSet;
@@ -18,6 +21,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * {@inheritDoc}
+ */
 class DefaultCallbackDispatcher implements CallbackDispatcher {
     private static final int START_MESSAGE = 0;
     private static final int ERROR_MESSAGE = 1;
@@ -39,11 +45,8 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         pendingResults = new ConcurrentHashMap<>();
         initListenerClass(context);
         readWriteLock = new ReentrantReadWriteLock();
-        HandlerThread handlerThread = new HandlerThread("Callbacks");
-        handlerThread.start();
 
-        // Handler for all callback calls (NOT on main thread).
-//        handler = new Handler(handlerThread.getLooper()) {
+        // Main thread handler for all callback calls
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
@@ -101,6 +104,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void registerCallback(UploadCallback callback) {
         readWriteLock.writeLock().lock();
@@ -118,6 +124,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void unregisterCallback(UploadCallback callback) {
         if (callback != null) {
@@ -130,6 +139,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void wakeListenerServiceWithRequestStart(Context appContext, String requestId) {
         Logger.d(TAG, String.format("wakeListenerServiceWithRequestStart, listenerClass: %s, alreadyRegistered: %s", listenerServiceClass, isListenerServiceAlreadyRegistered));
@@ -142,6 +154,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void wakeListenerServiceWithRequestFinished(Context appContext, String requestId, UploadStatus uploadStatus) {
         Logger.d(TAG, String.format("wakeListenerServiceWithRequestFinished, listenerClass: %s, alreadyRegistered: %s", listenerServiceClass, isListenerServiceAlreadyRegistered));
@@ -155,11 +170,17 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispatchStart(String requestId) {
         dispatchMessage(requestId, START_MESSAGE, CallbackMessage.obtain());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispatchProgress(String requestId, long bytes, long totalBytes) {
         CallbackMessage callbackMessage = CallbackMessage.obtain();
@@ -168,6 +189,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         dispatchMessage(requestId, PROGRESS_MESSAGE, callbackMessage);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispatchError(Context context, String requestId, String error) {
         pendingResults.put(requestId, new UploadResult(null, error));
@@ -176,6 +200,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         dispatchMessage(requestId, ERROR_MESSAGE, callbackMessage);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispatchReschedule(Context context, String requestId, String error) {
         CallbackMessage callbackMessage = CallbackMessage.obtain();
@@ -183,6 +210,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         dispatchMessage(requestId, RESCHEDULE_MESSAGE, callbackMessage);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispatchSuccess(Context context, String requestId, Map resultData) {
         pendingResults.put(requestId, new UploadResult(resultData, null));
@@ -191,6 +221,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         dispatchMessage(requestId, SUCCESS_MESSAGE, callbackMessage);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public UploadResult popPendingResult(String requestId) {
         return pendingResults.remove(requestId);

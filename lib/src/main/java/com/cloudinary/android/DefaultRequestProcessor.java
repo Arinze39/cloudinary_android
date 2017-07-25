@@ -5,9 +5,12 @@ import android.content.res.Resources;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.ProgressCallback;
+import com.cloudinary.android.callback.UploadStatus;
 import com.cloudinary.android.payload.NotFoundException;
 import com.cloudinary.android.payload.Payload;
 import com.cloudinary.android.payload.PayloadFactory;
+import com.cloudinary.android.signed.Signature;
+import com.cloudinary.android.signed.SignatureProvider;
 import com.cloudinary.utils.ObjectUtils;
 import com.cloudinary.utils.StringUtils;
 
@@ -17,10 +20,13 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.cloudinary.Uploader.BUFFER_SIZE;
-import static com.cloudinary.android.UploadStatus.FAILURE;
-import static com.cloudinary.android.UploadStatus.RESCHEDULE;
-import static com.cloudinary.android.UploadStatus.SUCCESS;
+import static com.cloudinary.android.callback.UploadStatus.FAILURE;
+import static com.cloudinary.android.callback.UploadStatus.RESCHEDULE;
+import static com.cloudinary.android.callback.UploadStatus.SUCCESS;
 
+/**
+ * {@inheritDoc}
+ */
 class DefaultRequestProcessor implements RequestProcessor {
     private static final String TAG = "DefaultRequestProcessor";
     private final CallbackDispatcher callbackDispatcher;
@@ -30,6 +36,10 @@ class DefaultRequestProcessor implements RequestProcessor {
         this.callbackDispatcher = callbackDispatcher;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UploadStatus processRequest(Context context, RequestParams params) {
 
         final String requestId = params.getString("requestId", null);
@@ -63,30 +73,15 @@ class DefaultRequestProcessor implements RequestProcessor {
             Logger.e(TAG, String.format("Request %s, error loading options.", requestId), e);
         }
 
-        String error = null;
+        String error = "Unknown error.";
 
-        if (!optionsLoadedSuccessfully) {
-            requestResultStatus = FAILURE;
-            error = "Cloud not load request options.";
-            Logger.d(TAG, String.format("Failing request %s, cannot load options.", requestId));
-        } else {
-            if (StringUtils.isBlank(uri)) {
-                requestResultStatus = FAILURE;
-                error = "Request Uri is empty.";
-                Logger.d(TAG, String.format("Failing request %s, Uri is empty.", requestId));
-            } else {
+        if (optionsLoadedSuccessfully) {
+            if (StringUtils.isNotBlank(uri)) {
                 Payload payload = PayloadFactory.fromUri(uri);
-                if (payload == null) {
-                    Logger.d(TAG, String.format("Failing request %s, payload cannot be loaded.", requestId));
-                    error = "Request payload could not be loaded.";
-                    requestResultStatus = FAILURE;
-                } else {
+                if (payload != null) {
                     int maxConcurrentRequests = CldAndroid.get().getGlobalUploadPolicy().getMaxConcurrentRequests();
                     int runningJobsCount = runningJobs.get();
-                    if (runningJobsCount >= maxConcurrentRequests) {
-                        Logger.d(TAG, String.format("Rescheduling request %s, too many running jobs: %d, max: %d", requestId, runningJobsCount, maxConcurrentRequests));
-                        return RESCHEDULE;
-                    } else {
+                    if (runningJobsCount < maxConcurrentRequests) {
                         try {
                             resultData = doProcess(requestId, appContext, options, params, payload);
                             requestResultStatus = SUCCESS;
@@ -102,6 +97,10 @@ class DefaultRequestProcessor implements RequestProcessor {
                             Logger.e(TAG, String.format("FileNotFoundException for request %s.", requestId), e);
                             requestResultStatus = FAILURE;
                             error = "The requested file does not exist.";
+                        } catch (ErrorRetrievingSignatureException e) {
+                            Logger.e(TAG, String.format("Error retrieving signature for request %s.", requestId), e);
+                            requestResultStatus = FAILURE;
+                            error = e.getMessage();
                         } catch (IOException e) {
                             Logger.e(TAG, String.format("IOException for request %s.", requestId), e);
                             error = String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage());
@@ -113,16 +112,31 @@ class DefaultRequestProcessor implements RequestProcessor {
                         } finally {
                             runningJobs.decrementAndGet();
                         }
+                    } else {
+                        Logger.d(TAG, String.format("Rescheduling request %s, too many running jobs: %d, max: %d", requestId, runningJobsCount, maxConcurrentRequests));
+                        requestResultStatus = RESCHEDULE;
                     }
+                } else {
+                    Logger.d(TAG, String.format("Failing request %s, payload cannot be loaded.", requestId));
+                    error = "Request payload could not be loaded.";
+                    requestResultStatus = FAILURE;
                 }
+            } else {
+                requestResultStatus = FAILURE;
+                error = "Request Uri is empty.";
+                Logger.d(TAG, String.format("Failing request %s, Uri is empty.", requestId));
             }
+        } else {
+            requestResultStatus = FAILURE;
+            error = "Cloud not load request options.";
+            Logger.d(TAG, String.format("Failing request %s, cannot load options.", requestId));
         }
 
         if (requestResultStatus.isFinal()) {
             if (requestResultStatus == SUCCESS) {
                 callbackDispatcher.dispatchSuccess(context, requestId, resultData);
             } else {
-                callbackDispatcher.dispatchError(context, requestId, StringUtils.isEmpty(error) ? "Unknown error." : error);
+                callbackDispatcher.dispatchError(context, requestId, error);
             }
 
             // wake up the listener (this is not needed for reschedules since if the listener is down no point in reschedule notification.
@@ -138,7 +152,7 @@ class DefaultRequestProcessor implements RequestProcessor {
         return requestResultStatus;
     }
 
-    private Map doProcess(final String requestId, Context appContext, Map<String, Object> options, RequestParams params, Payload payload) throws NotFoundException, IOException {
+    private Map doProcess(final String requestId, Context appContext, Map<String, Object> options, RequestParams params, Payload payload) throws NotFoundException, IOException, ErrorRetrievingSignatureException {
         Logger.d(TAG, String.format("Starting upload for request %s", requestId));
         runningJobs.incrementAndGet();
         final long actualTotalBytes = payload.getLength(appContext);

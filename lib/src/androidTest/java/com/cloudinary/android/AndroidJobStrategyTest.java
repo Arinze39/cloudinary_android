@@ -4,6 +4,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.cloudinary.android.payload.FilePayload;
+import com.cloudinary.android.policy.TimeWindow;
+import com.cloudinary.android.policy.UploadPolicy;
 import com.evernote.android.job.JobRequest;
 
 import org.junit.Test;
