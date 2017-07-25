@@ -102,6 +102,10 @@ class DefaultRequestProcessor implements RequestProcessor {
                             Logger.e(TAG, String.format("FileNotFoundException for request %s.", requestId), e);
                             requestResultStatus = FAILURE;
                             error = "The requested file does not exist.";
+                        } catch (ErrorRetrievingSignatureException e) {
+                            Logger.e(TAG, String.format("Error retrieving signature for request %s.", requestId), e);
+                            requestResultStatus = FAILURE;
+                            error = e.getMessage();
                         } catch (IOException e) {
                             Logger.e(TAG, String.format("IOException for request %s.", requestId), e);
                             error = String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage());
@@ -138,7 +142,7 @@ class DefaultRequestProcessor implements RequestProcessor {
         return requestResultStatus;
     }
 
-    private Map doProcess(final String requestId, Context appContext, Map<String, Object> options, RequestParams params, Payload payload) throws NotFoundException, IOException {
+    private Map doProcess(final String requestId, Context appContext, Map<String, Object> options, RequestParams params, Payload payload) throws NotFoundException, IOException, ErrorRetrievingSignatureException {
         Logger.d(TAG, String.format("Starting upload for request %s", requestId));
         runningJobs.incrementAndGet();
         final long actualTotalBytes = payload.getLength(appContext);

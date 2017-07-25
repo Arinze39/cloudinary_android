@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.util.Pools;
@@ -39,11 +38,8 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         pendingResults = new ConcurrentHashMap<>();
         initListenerClass(context);
         readWriteLock = new ReentrantReadWriteLock();
-        HandlerThread handlerThread = new HandlerThread("Callbacks"); // REVIEW remove
-        handlerThread.start();
 
-        // Handler for all callback calls (NOT on main thread).
-//        handler = new Handler(handlerThread.getLooper()) { // REVIEW delete?
+        // Main thread handler for all callback calls
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {

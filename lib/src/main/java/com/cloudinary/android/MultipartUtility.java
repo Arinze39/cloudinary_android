@@ -2,7 +2,13 @@ package com.cloudinary.android;
 
 import com.cloudinary.Cloudinary;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -15,16 +21,15 @@ import java.util.Map;
  * @author Cloudinary
  */
 public class MultipartUtility {
-    private final String boundary;
+    public final static String USER_AGENT = "CloudinaryAndroid/" + Cloudinary.VERSION;
     private static final String LINE_FEED = "\r\n";
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
+    private final String boundary;
     private final MultipartCallback multipartCallback;
     private HttpURLConnection httpConn;
     private String charset;
     private OutputStream outputStream;
     private PrintWriter writer;
-
-    public final static String USER_AGENT = "CloudinaryAndroid/" + Cloudinary.VERSION;
 
     /**
      * This constructor initializes a new HTTP POST request with content type is

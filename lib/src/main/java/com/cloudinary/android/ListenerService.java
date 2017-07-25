@@ -2,7 +2,6 @@ package com.cloudinary.android;
 
 import android.app.Service;
 import android.content.Intent;
-import android.util.Log;
 
 import com.cloudinary.utils.StringUtils;
 
@@ -32,8 +31,6 @@ public abstract class ListenerService extends Service implements UploadCallback{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand");
-
         if (intent != null) {
             final String requestId = intent.getStringExtra(CldAndroid.INTENT_EXTRA_REQUEST_ID);
 

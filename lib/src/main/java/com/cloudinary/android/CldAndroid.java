@@ -33,7 +33,7 @@ public class CldAndroid {
     private final com.cloudinary.Cloudinary cloudinary;
     private final RequestDispatcherInterface requestDispatcher;
     private final RequestProcessor requestProcessor;
-    private final DefaultCallbackDispatcher callbackDispatcher; //REVIEW why not using interface
+    private final CallbackDispatcher callbackDispatcher;
     private final BackgroundRequestStrategy strategy;
     private final SignatureProvider signatureProvider;
     private final UploadCallback callback;
