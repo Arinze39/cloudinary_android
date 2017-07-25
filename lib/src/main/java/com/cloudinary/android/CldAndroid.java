@@ -304,7 +304,7 @@ public class CldAndroid {
 
     private UploadRequest buildUploadRequest(Payload payload) {
         UploadContext<Payload> payloadUploadContext = new UploadContext<>(payload, requestDispatcher);
-        return new UploadRequest(payloadUploadContext, null);
+        return new UploadRequest(payloadUploadContext);
     }
 
     /**

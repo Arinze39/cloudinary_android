@@ -10,7 +10,7 @@ public abstract class Payload<T> {
 
     public Payload(T data){
         this.data = data;
-    }
+    } // REVIEW if generics is only constructor and "data", maybe remove the generics?
 
     public Payload(){
     }

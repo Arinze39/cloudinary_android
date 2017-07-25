@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * This class is used to register custom payload types and create instances from Payload URIs
  */
-public class PayloadFactory {
+public class PayloadFactory { // REVIEW change to typed. Keep a copy somewhere :-)
     private static final String TAG = PayloadFactory.class.getSimpleName();
     private static Map<String, Class<? extends Payload>> types = new HashMap<>();
 

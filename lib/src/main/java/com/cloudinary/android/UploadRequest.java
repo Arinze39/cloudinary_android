@@ -19,13 +19,17 @@ import java.util.Map;
  */
 public class UploadRequest<T extends Payload> {
     private final UploadContext<T> uploadContext;
-    private String requestId;
+    private String requestId; // REVIEW requestId is set once and never unset. why not assign a UUID in the constructor instead of in com.cloudinary.android.DefaultRequestDispatcher.dispatch?
     private boolean dispatched = false;
     private UploadPolicy uploadPolicy = CldAndroid.get().getGlobalUploadPolicy();
     private TimeWindow timeWindow = TimeWindow.getDefault();
     private UploadCallback callback;
     private Map<String, Object> options;
     private String optionsAsString = null;
+
+    UploadRequest(UploadContext<T> uploadContext) {
+        this.uploadContext = uploadContext;
+    }
 
     UploadRequest(UploadContext<T> uploadContext, @Nullable Map<String, Object> options) {
         this.uploadContext = uploadContext;
@@ -36,9 +40,9 @@ public class UploadRequest<T extends Payload> {
         return requestId;
     }
 
-    synchronized void setRequestId(String requestId) {
+    synchronized void setRequestId(String requestId) { // REVIEW what is the scenario? When is this set?
         if (StringUtils.isNotBlank(this.requestId)) {
-            throw new IllegalStateException("Id already set");
+            throw new IllegalStateException("Id already set"); // REVIEW this will bubble up to the client code
         }
         this.requestId = requestId;
     }
@@ -147,7 +151,7 @@ public class UploadRequest<T extends Payload> {
 
     private void assertNotDispatched() {
         if (dispatched) {
-            throw new IllegalStateException("Request already dispatched");
+            throw new IllegalStateException("Request already dispatched"); // REVIEW this will crash the App. How bad and how rare is this state?
         }
     }
 
