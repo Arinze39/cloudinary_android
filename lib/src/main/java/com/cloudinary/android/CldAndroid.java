@@ -8,11 +8,17 @@ import android.support.annotation.Nullable;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Url;
+import com.cloudinary.android.callback.UploadCallback;
+import com.cloudinary.android.callback.UploadResult;
+import com.cloudinary.android.callback.UploadStatus;
 import com.cloudinary.android.payload.ByteArrayPayload;
 import com.cloudinary.android.payload.FilePayload;
 import com.cloudinary.android.payload.LocalUriPayload;
 import com.cloudinary.android.payload.Payload;
 import com.cloudinary.android.payload.ResourcePayload;
+import com.cloudinary.android.policy.GlobalUploadPolicy;
+import com.cloudinary.android.policy.UploadPolicy;
+import com.cloudinary.android.signed.SignatureProvider;
 import com.cloudinary.utils.StringUtils;
 
 import java.util.Map;
@@ -31,7 +37,7 @@ public class CldAndroid {
     private static CldAndroid _instance;
 
     private final com.cloudinary.Cloudinary cloudinary;
-    private final RequestDispatcherInterface requestDispatcher;
+    private final RequestDispatcher requestDispatcher;
     private final RequestProcessor requestProcessor;
     private final CallbackDispatcher callbackDispatcher;
     private final BackgroundRequestStrategy strategy;
@@ -44,7 +50,7 @@ public class CldAndroid {
         // use context to initialize components but DO NOT store it
         strategy = BackgroundStrategyProvider.provideStrategy();
         callbackDispatcher = new DefaultCallbackDispatcher(context);
-        requestDispatcher = new RequestDispatcher(strategy);
+        requestDispatcher = new DefaultRequestDispatcher(strategy);
         requestProcessor = new DefaultRequestProcessor(callbackDispatcher);
         strategy.init(context);
         this.signatureProvider = signatureProvider;
@@ -147,6 +153,11 @@ public class CldAndroid {
         return _instance;
     }
 
+    /**
+     * Set the log level. In order to affect initialization logging this can be set before calling {@link CldAndroid#init(Context)}.
+     *
+     * @param logLevel The log level to set, see {@link LogLevel}.
+     */
     public static void setLogLevel(LogLevel logLevel) {
         Logger.logLevel = logLevel;
     }

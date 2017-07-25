@@ -2,6 +2,11 @@ package com.cloudinary.android;
 
 import android.content.Context;
 
+import com.cloudinary.android.callback.UploadStatus;
+
+/**
+ * Handles the processing of an upload request.
+ */
 interface RequestProcessor {
 
     /**

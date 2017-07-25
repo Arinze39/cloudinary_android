@@ -1,4 +1,4 @@
-package com.cloudinary.android;
+package com.cloudinary.android.policy;
 
 /**
  * Global configuration and parameters for all upload requests. Use {@link Builder} to configure and get an instance.

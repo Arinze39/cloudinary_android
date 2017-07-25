@@ -1,6 +1,9 @@
-package com.cloudinary.android;
+package com.cloudinary.android.signed;
 
 import android.content.Context;
+
+import com.cloudinary.android.CldAndroid;
+import com.cloudinary.android.UploadRequest;
 
 import java.util.Map;
 

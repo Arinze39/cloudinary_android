@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 
+import com.cloudinary.android.callback.UploadStatus;
+import com.cloudinary.android.policy.UploadPolicy;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
@@ -72,17 +74,26 @@ class AndroidJobStrategy implements BackgroundRequestStrategy {
         return Job.Result.FAILURE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void init(Context context) {
         JobManager.create(context).addJobCreator(new JobCreator());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doDispatch(UploadRequest request) {
         JobRequest job = adapt(request);
         job.schedule();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void executeRequestsNow(int howMany) {
         int started = 0;
@@ -105,6 +116,9 @@ class AndroidJobStrategy implements BackgroundRequestStrategy {
         return jobRequest.getStartMs() < SOON_THRESHOLD;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean cancelRequest(String requestId) {
         boolean cancelled = false;
@@ -120,12 +134,18 @@ class AndroidJobStrategy implements BackgroundRequestStrategy {
         return cancelled;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int cancelAllRequests() {
         Logger.i(TAG, "All requests cancelled.");
         return JobManager.instance().cancelAll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getPendingImmediateJobsCount() {
         int pending = 0;
@@ -142,6 +162,9 @@ class AndroidJobStrategy implements BackgroundRequestStrategy {
         return jobRequest.getStartMs() < IMMEDIATE_THRESHOLD;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getRunningJobsCount() {
         int running = 0;

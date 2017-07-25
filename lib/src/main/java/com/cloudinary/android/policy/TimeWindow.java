@@ -1,4 +1,4 @@
-package com.cloudinary.android;
+package com.cloudinary.android.policy;
 
 /**
  * Represents the time window in which the request must be executed. See {@link Builder} for details.
@@ -49,7 +49,7 @@ public class TimeWindow {
      * @param minutes Minutes to defer by
      * @return The new instance.
      */
-    TimeWindow newDeferredWindow(int minutes) {
+    public TimeWindow newDeferredWindow(int minutes) {
         long deferBy = minutes * 60 * 1000;
         return new TimeWindow(minLatencyOffsetMillis + deferBy, maxExecutionDelayMillis + deferBy);
     }

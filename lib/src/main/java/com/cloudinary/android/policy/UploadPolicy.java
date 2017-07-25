@@ -1,4 +1,4 @@
-package com.cloudinary.android;
+package com.cloudinary.android.policy;
 
 /**
  * Represents the set of conditions that must be met for a request to execute. Note: A request will be executed regardless of policy once the {@link TimeWindow} expires.

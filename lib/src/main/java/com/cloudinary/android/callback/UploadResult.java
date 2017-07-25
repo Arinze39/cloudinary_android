@@ -1,4 +1,4 @@
-package com.cloudinary.android;
+package com.cloudinary.android.callback;
 
 import java.util.Map;
 
@@ -11,7 +11,7 @@ public class UploadResult {
     private final Map successResultData;
     private final String error;
 
-    UploadResult(Map successResultData, String error) {
+    public UploadResult(Map successResultData, String error) {
         this.successResultData = successResultData;
         this.error = error;
     }

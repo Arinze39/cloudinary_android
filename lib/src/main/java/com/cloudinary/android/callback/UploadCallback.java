@@ -1,4 +1,4 @@
-package com.cloudinary.android;
+package com.cloudinary.android.callback;
 
 import java.util.Map;
 

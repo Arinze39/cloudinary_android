@@ -2,7 +2,10 @@ package com.cloudinary.android;
 
 import android.support.annotation.Nullable;
 
+import com.cloudinary.android.callback.UploadCallback;
 import com.cloudinary.android.payload.Payload;
+import com.cloudinary.android.policy.TimeWindow;
+import com.cloudinary.android.policy.UploadPolicy;
 import com.cloudinary.utils.ObjectUtils;
 import com.cloudinary.utils.StringUtils;
 

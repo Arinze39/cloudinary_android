@@ -5,9 +5,12 @@ import android.content.res.Resources;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.ProgressCallback;
+import com.cloudinary.android.callback.UploadStatus;
 import com.cloudinary.android.payload.NotFoundException;
 import com.cloudinary.android.payload.Payload;
 import com.cloudinary.android.payload.PayloadFactory;
+import com.cloudinary.android.signed.Signature;
+import com.cloudinary.android.signed.SignatureProvider;
 import com.cloudinary.utils.ObjectUtils;
 import com.cloudinary.utils.StringUtils;
 
@@ -17,10 +20,13 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.cloudinary.Uploader.BUFFER_SIZE;
-import static com.cloudinary.android.UploadStatus.FAILURE;
-import static com.cloudinary.android.UploadStatus.RESCHEDULE;
-import static com.cloudinary.android.UploadStatus.SUCCESS;
+import static com.cloudinary.android.callback.UploadStatus.FAILURE;
+import static com.cloudinary.android.callback.UploadStatus.RESCHEDULE;
+import static com.cloudinary.android.callback.UploadStatus.SUCCESS;
 
+/**
+ * {@inheritDoc}
+ */
 class DefaultRequestProcessor implements RequestProcessor {
     private static final String TAG = "DefaultRequestProcessor";
     private final CallbackDispatcher callbackDispatcher;
@@ -30,6 +36,10 @@ class DefaultRequestProcessor implements RequestProcessor {
         this.callbackDispatcher = callbackDispatcher;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UploadStatus processRequest(Context context, RequestParams params) {
 
         final String requestId = params.getString("requestId", null);

@@ -2,6 +2,10 @@ package com.cloudinary.android;
 
 import android.content.Context;
 
+import com.cloudinary.android.callback.UploadCallback;
+import com.cloudinary.android.callback.UploadResult;
+import com.cloudinary.android.callback.UploadStatus;
+
 import java.util.Map;
 
 /**

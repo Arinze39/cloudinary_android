@@ -1,5 +1,7 @@
 package com.cloudinary.android;
 
+import android.os.Build;
+
 import com.cloudinary.Cloudinary;
 
 import java.io.File;
@@ -21,7 +23,7 @@ import java.util.Map;
  * @author Cloudinary
  */
 public class MultipartUtility {
-    public final static String USER_AGENT = "CloudinaryAndroid/" + Cloudinary.VERSION;
+    public final static String USER_AGENT = "CloudinaryAndroid/" + Cloudinary.VERSION + " (" + Build.VERSION.RELEASE + "; " + Build.MODEL + " Build/" + Build.DISPLAY;
     private static final String LINE_FEED = "\r\n";
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
     private final String boundary;
@@ -59,7 +61,7 @@ public class MultipartUtility {
             }
         }
         httpConn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-        httpConn.setRequestProperty("User-Agent", USER_AGENT); // REVIEW add more details
+        httpConn.setRequestProperty("User-Agent", USER_AGENT);
         outputStream = httpConn.getOutputStream();
         writer = new PrintWriter(new OutputStreamWriter(outputStream, charset), true);
     }
