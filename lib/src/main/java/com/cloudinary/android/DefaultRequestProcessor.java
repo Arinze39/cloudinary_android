@@ -65,7 +65,7 @@ class DefaultRequestProcessor implements RequestProcessor {
         boolean optionsLoadedSuccessfully = false;
         Map<String, Object> options = null;
         try {
-            options = (Map<String, Object>) ObjectUtils.deserialize(optionsAsString);
+            options = UploadRequest.decodeOptions(optionsAsString);
             optionsLoadedSuccessfully = true;
         } catch (IOException e) {
             Logger.e(TAG, String.format("Request %s, error loading options.", requestId), e);
@@ -179,7 +179,7 @@ class DefaultRequestProcessor implements RequestProcessor {
                     options.put("timestamp", signature.getTimestamp());
                     options.put("api_key", signature.getApiKey());
                 } catch (Exception e) {
-                    throw new ErrorRetrievingSignatureException("Could not retrieve signature from the given provider: " + signatureProvider.getName(), e); 
+                    throw new ErrorRetrievingSignatureException("Could not retrieve signature from the given provider: " + signatureProvider.getName(), e);
                 }
             }
         }

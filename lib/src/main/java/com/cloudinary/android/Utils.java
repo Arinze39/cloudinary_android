@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 
 public class Utils {
-    public static String cloudinaryUrlFromContext(Context context) { // REVIEW why is it public?
+    public static String cloudinaryUrlFromContext(Context context) {
         String url = "";
         try {
             PackageManager packageManager = context.getPackageManager();
