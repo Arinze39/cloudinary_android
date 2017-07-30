@@ -28,6 +28,7 @@ import java.util.Map;
  * Must be initialized before use, see {@link #init(Context, SignatureProvider, Map)}.
  */
 public class CldAndroid {
+
     public static final String INTENT_EXTRA_REQUEST_ID = "INTENT_EXTRA_REQUEST_ID";
     public static final String INTENT_EXTRA_REQUEST_RESULT_STATUS = "INTENT_EXTRA_REQUEST_RESULT_STATUS";
     public static final String ACTION_REQUEST_STARTED = "com.cloudinary.ACTION_REQUEST_STARTED";
@@ -80,12 +81,12 @@ public class CldAndroid {
             }
 
             @Override
-            public void onError(String requestId, String error) {
+            public void onError(String requestId, int error) {
                 queueRoomFreed();
             }
 
             @Override
-            public void onReschedule(String requestId, String errorMessage) {
+            public void onReschedule(String requestId, int errorMessage) {
                 queueRoomFreed();
             }
         };
@@ -95,6 +96,7 @@ public class CldAndroid {
 
     /**
      * Setup the library with the required parameters. A flavor of init() must be called once before CldAndroid can be used, preferably in an implementation of {@link Application#onCreate()}.
+     *
      * @param context Android context for initializations. Does not get cached.
      */
     public static void init(@NonNull Context context) {
@@ -103,8 +105,9 @@ public class CldAndroid {
 
     /**
      * Setup the library with the required parameters. A flavor of init() must be called once before CldAndroid can be used, preferably in an implementation of {@link Application#onCreate()}.
+     *
      * @param context Android context for initializations. Does not get cached.
-     * @param config Cloudinary configuration parameters. If not supplied a cloudinary-url metadata must exist in the manifest.
+     * @param config  Cloudinary configuration parameters. If not supplied a cloudinary-url metadata must exist in the manifest.
      */
     public static void init(@NonNull Context context, @Nullable Map config) {
         init(context, null, config);
@@ -112,7 +115,8 @@ public class CldAndroid {
 
     /**
      * Setup the library with the required parameters. A flavor of init() must be called once before CldAndroid can be used, preferably in an implementation of {@link Application#onCreate()}.
-     * @param context Android context for initializations. Does not get cached.
+     *
+     * @param context           Android context for initializations. Does not get cached.
      * @param signatureProvider A signature provider. Needed if using signed uploads.
      */
     public static void init(@NonNull Context context, @Nullable SignatureProvider signatureProvider) {
@@ -121,9 +125,10 @@ public class CldAndroid {
 
     /**
      * Setup the library with the required parameters. A flavor of init() must be called once before CldAndroid can be used, preferably in an implementation of {@link Application#onCreate()}.
-     * @param context Android context for initializations. Does not get cached.
+     *
+     * @param context  Android context for initializations. Does not get cached.
      * @param provider A signature provider. Needed if using signed uploads.
-     * @param config Cloudinary configuration parameters. If not supplied a cloudinary-url metadata must exist in the manifest.
+     * @param config   Cloudinary configuration parameters. If not supplied a cloudinary-url metadata must exist in the manifest.
      */
     public static void init(@NonNull Context context, @Nullable SignatureProvider provider, @Nullable Map config) {
         synchronized (CldAndroid.class) {
@@ -143,6 +148,7 @@ public class CldAndroid {
 
     /**
      * Entry point for any operation against Cloudinary
+     *
      * @return An instance of the CldAndroid class to run operations against cloudinary.
      */
     public static CldAndroid get() {
@@ -175,6 +181,7 @@ public class CldAndroid {
 
     /**
      * Get an instance of the Cloudinary class for raw operations (not wrapped).
+     *
      * @return A Pre-configured {@link com.cloudinary.Cloudinary} instance
      */
 
@@ -191,6 +198,7 @@ public class CldAndroid {
 
     /**
      * Cancel an upload request.
+     *
      * @param requestId Id of the request to cancel.
      * @return True if the request was found and cancelled successfully.
      */
@@ -200,6 +208,7 @@ public class CldAndroid {
 
     /**
      * * Cancel all upload requests.
+     *
      * @return The count of canceled requests and running jobs.
      */
     public int cancelAllRequests() {
@@ -208,6 +217,7 @@ public class CldAndroid {
 
     /**
      * Entry point to start an upload of a raw resource.
+     *
      * @param rawResourceId Android R generated raw resource identifier
      * @return {@link UploadRequest} instance. Setup the request and call {@link UploadRequest#dispatch()} to start uploading.
      */
@@ -217,6 +227,7 @@ public class CldAndroid {
 
     /**
      * Entry point to start an upload of a uri.
+     *
      * @param uri Android R generated raw resource identifier
      * @return {@link UploadRequest} instance. Setup the request and call {@link UploadRequest#dispatch()} to start uploading.
      */
@@ -226,6 +237,7 @@ public class CldAndroid {
 
     /**
      * Entry point to start an upload of a byte array.
+     *
      * @param bytes A byte array containing image/video/raw data to upload.
      * @return {@link UploadRequest} instance. Setup the request and call {@link UploadRequest#dispatch()} to start uploading.
      */
@@ -235,6 +247,7 @@ public class CldAndroid {
 
     /**
      * Entry point to start an upload of a file.
+     *
      * @param filePath An absolute file path to upload.
      * @return {@link UploadRequest} instance. Setup the request and call {@link UploadRequest#dispatch()} to start uploading.
      */
@@ -244,6 +257,7 @@ public class CldAndroid {
 
     /**
      * Entry point to start an upload of a generic payload. Only use this with custom payloads.
+     *
      * @param payload The payload to upload
      * @return {@link UploadRequest} instance. Setup the request and call {@link UploadRequest#dispatch()} to start uploading.
      */
@@ -260,14 +274,16 @@ public class CldAndroid {
 
     /**
      * Setup the global upload policy for Cloudinary.
+     *
      * @param globalUploadPolicy The policy to set. See {@link UploadPolicy.Builder}.
-     * */
+     */
     public void setGlobalUploadPolicy(GlobalUploadPolicy globalUploadPolicy) {
         this.globalUploadPolicy = globalUploadPolicy;
     }
 
     /**
      * Register a callback for state changes and results of requests.
+     *
      * @param callback The callback to activate upon state changes and results.
      */
     public void registerCallback(UploadCallback callback) {
@@ -276,8 +292,9 @@ public class CldAndroid {
 
     /**
      * Register a callback for state changes and results for a specific request.
+     *
      * @param requestId The id of the request.
-     * @param callback The callback to activate upon state changes and results.
+     * @param callback  The callback to activate upon state changes and results.
      */
     void registerCallback(String requestId, UploadCallback callback) {
         callbackDispatcher.registerCallback(requestId, callback);
@@ -285,6 +302,7 @@ public class CldAndroid {
 
     /**
      * Unregister a callback
+     *
      * @param callback The callback to unregister.
      */
     public void unregisterCallback(UploadCallback callback) {
@@ -295,6 +313,7 @@ public class CldAndroid {
      * Fetch a pending result. In case the app wasn't awake when the upload stopped, successfully or not, the result can be fetched here. Assuming
      * the app wakes up through a the callback service defined in the manifest, it should get the full results by calling this method.
      * Note: the result is cleared once this method is called.
+     *
      * @param requestId Id of the request to fetch results for.
      * @return The upload result.
      */
@@ -309,6 +328,7 @@ public class CldAndroid {
 
     /**
      * Process a single request, this runs after verifying all the policies and conditions are met. For internal use.
+     *
      * @param context Android context.
      */
     UploadStatus processRequest(Context context, RequestParams params) {
@@ -321,5 +341,19 @@ public class CldAndroid {
 
     SignatureProvider getSignatureProvider() {
         return signatureProvider;
+    }
+
+    public interface Errors {
+        /**  */
+        int NO_ERROR = 0;
+        int FILE_DOES_NOT_EXIST = 1;
+        int URI_DOES_NOT_EXIST = 2;
+        int RESOURCE_DOES_NOT_EXIST = 3;
+        int SIGNATURE_FAILURE = 4;
+        int NETWORK_ERROR = 5;
+        int UNKNOWN_ERROR = 6;
+        int PAYLOAD_LOAD_FAILURE = 7;
+        int PAYLOAD_EMPTY = 8;
+        int OPTIONS_FAILURE = 9;
     }
 }

@@ -33,8 +33,8 @@ public class CallbackDispatcherTest {
         dispatcher.dispatchStart("a");
         dispatcher.dispatchProgress("a", 10, 100);
         dispatcher.dispatchSuccess(appContext, "a", Collections.singletonMap("test1", "result1"));
-        dispatcher.dispatchError(appContext, "a", "Error!");
-        dispatcher.dispatchReschedule(appContext, "a", "Error?");
+        dispatcher.dispatchError(appContext, "a", CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST);
+        dispatcher.dispatchReschedule(appContext, "a", CldAndroid.Errors.FILE_DOES_NOT_EXIST);
 
         // callbacks are posted to dedicated thread, give it time to propagate
         Thread.sleep(DISPATCH_SLEEP_MILLIS);
@@ -47,7 +47,7 @@ public class CallbackDispatcherTest {
 
         dispatcher.dispatchProgress("b", 10, 100);
         dispatcher.dispatchSuccess(appContext, "b", Collections.singletonMap("test2", "result2"));
-        dispatcher.dispatchError(appContext, "b", "Error!");
+        dispatcher.dispatchError(appContext, "b", CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST);
 
         Thread.sleep(DISPATCH_SLEEP_MILLIS);
         assertEquals(2, callbackCounter.progress);
@@ -58,7 +58,7 @@ public class CallbackDispatcherTest {
 
         dispatcher.dispatchProgress("c", 10, 100);
         dispatcher.dispatchSuccess(appContext, "c", Collections.singletonMap("test3", "result3"));
-        dispatcher.dispatchError(appContext, "c", "Error!");
+        dispatcher.dispatchError(appContext, "c", CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST);
 
         Thread.sleep(DISPATCH_SLEEP_MILLIS);
 
@@ -102,13 +102,13 @@ public class CallbackDispatcherTest {
         assertNull(res2);
         assertNull(res3);
 
-        dispatcher.dispatchError(appContext, "a", "error!");
+        dispatcher.dispatchError(appContext, "a", CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST);
 
         Thread.sleep(DISPATCH_SLEEP_MILLIS);
 
         res1 = dispatcher.popPendingResult("a");
         assertNotNull(res1);
-        assertEquals("error!", res1.getError());
+        assertEquals(CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST, res1.getError());
     }
 
     private final static class CallbackCounter implements UploadCallback {
@@ -135,12 +135,12 @@ public class CallbackDispatcherTest {
         }
 
         @Override
-        public void onError(String requestId, String error) {
+        public void onError(String requestId, int error) {
             this.error++;
         }
 
         @Override
-        public void onReschedule(String requestId, String errorMessage) {
+        public void onReschedule(String requestId, int error) {
             this.reschedule++;
         }
     }

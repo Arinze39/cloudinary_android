@@ -59,13 +59,13 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
                         callbackMessage.callback.onStart(requestId);
                         break;
                     case ERROR_MESSAGE:
-                        callbackMessage.callback.onError(requestId, callbackMessage.errorMessage);
+                        callbackMessage.callback.onError(requestId, callbackMessage.errorCode);
                         break;
                     case PROGRESS_MESSAGE:
                         callbackMessage.callback.onProgress(requestId, callbackMessage.bytes, callbackMessage.totalBytes);
                         break;
                     case RESCHEDULE_MESSAGE:
-                        callbackMessage.callback.onReschedule(requestId, callbackMessage.errorMessage);
+                        callbackMessage.callback.onReschedule(requestId, callbackMessage.errorCode);
                         break;
                     case SUCCESS_MESSAGE:
                         callbackMessage.callback.onSuccess(requestId, callbackMessage.resultData);
@@ -193,10 +193,10 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
      * {@inheritDoc}
      */
     @Override
-    public void dispatchError(Context context, String requestId, String error) {
+    public void dispatchError(Context context, String requestId, int error) {
         pendingResults.put(requestId, new UploadResult(null, error));
         CallbackMessage callbackMessage = CallbackMessage.obtain();
-        callbackMessage.errorMessage = error;
+        callbackMessage.errorCode = error;
         dispatchMessage(requestId, ERROR_MESSAGE, callbackMessage);
     }
 
@@ -204,9 +204,9 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
      * {@inheritDoc}
      */
     @Override
-    public void dispatchReschedule(Context context, String requestId, String error) {
+    public void dispatchReschedule(Context context, String requestId, int error) {
         CallbackMessage callbackMessage = CallbackMessage.obtain();
-        callbackMessage.errorMessage = error;
+        callbackMessage.errorCode = error;
         dispatchMessage(requestId, RESCHEDULE_MESSAGE, callbackMessage);
     }
 
@@ -215,7 +215,7 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
      */
     @Override
     public void dispatchSuccess(Context context, String requestId, Map resultData) {
-        pendingResults.put(requestId, new UploadResult(resultData, null));
+        pendingResults.put(requestId, new UploadResult(resultData, CldAndroid.Errors.NO_ERROR));
         CallbackMessage callbackMessage = CallbackMessage.obtain();
         callbackMessage.resultData = resultData;
         dispatchMessage(requestId, SUCCESS_MESSAGE, callbackMessage);
@@ -291,7 +291,7 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
         private String requestId;
         private long bytes;
         private long totalBytes;
-        private String errorMessage;
+        private int errorCode;
         private Map resultData;
 
         static CallbackMessage obtain() {
@@ -305,7 +305,7 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
             instance.callback = callbackMessage.callback;
             instance.bytes = callbackMessage.bytes;
             instance.totalBytes = callbackMessage.totalBytes;
-            instance.errorMessage = callbackMessage.errorMessage;
+            instance.errorCode = callbackMessage.errorCode;
             instance.resultData = callbackMessage.resultData;
             return instance;
         }
@@ -315,7 +315,7 @@ class DefaultCallbackDispatcher implements CallbackDispatcher {
             requestId = null;
             bytes = -1;
             totalBytes = -1;
-            errorMessage = null;
+            errorCode = CldAndroid.Errors.NO_ERROR;
             resultData = null;
             sPool.release(this);
         }

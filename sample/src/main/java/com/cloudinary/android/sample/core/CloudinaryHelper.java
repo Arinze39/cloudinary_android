@@ -7,6 +7,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import com.cloudinary.android.CldAndroid;
 import com.cloudinary.android.sample.R;
+import com.cloudinary.android.sample.app.MainApplication;
 import com.cloudinary.android.sample.app.Utils;
 import com.cloudinary.android.sample.model.EffectData;
 import com.cloudinary.android.sample.model.Resource;
@@ -82,6 +83,44 @@ public class CloudinaryHelper {
         effects.add(new EffectData(thumbUrl, imageUrl, context.getString(R.string.effect_desc_narrow_sepia)));
 
         return effects;
+    }
+
+    public static String getErrorMessage(int error) {
+        int stringResId;
+        switch (error) {
+            case CldAndroid.Errors.NO_ERROR:
+                stringResId = R.string.no_error_message;
+                break;
+            case CldAndroid.Errors.FILE_DOES_NOT_EXIST:
+                stringResId = R.string.file_does_not_exist;
+                break;
+            case CldAndroid.Errors.NETWORK_ERROR:
+                stringResId = R.string.network_error;
+                break;
+            case CldAndroid.Errors.OPTIONS_FAILURE:
+                stringResId = R.string.options_failure;
+                break;
+            case CldAndroid.Errors.PAYLOAD_EMPTY:
+                stringResId = R.string.payload_empty;
+                break;
+            case CldAndroid.Errors.PAYLOAD_LOAD_FAILURE:
+                stringResId = R.string.payload_could_not_load;
+                break;
+            case CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST:
+                stringResId = R.string.resource_does_not_exist;
+                break;
+            case CldAndroid.Errors.SIGNATURE_FAILURE:
+                stringResId = R.string.signature_failure;
+                break;
+            case CldAndroid.Errors.URI_DOES_NOT_EXIST:
+                stringResId = R.string.uri_does_not_exist;
+                break;
+            case CldAndroid.Errors.UNKNOWN_ERROR:
+            default:
+                stringResId = R.string.unknown_error;
+        }
+
+        return MainApplication.get().getString(stringResId);
     }
 
     public interface DeleteCallback {

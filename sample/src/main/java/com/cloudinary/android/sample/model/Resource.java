@@ -1,5 +1,8 @@
 package com.cloudinary.android.sample.model;
 
+import com.cloudinary.android.CldAndroid;
+import com.cloudinary.android.sample.core.CloudinaryHelper;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -85,6 +88,14 @@ public class Resource implements Serializable {
 
     public void setLastError(String lastError) {
         this.lastError = lastError;
+    }
+
+    public void setLastError(int errorCode) {
+        if (errorCode == CldAndroid.Errors.NO_ERROR) {
+            lastError = null;
+        } else {
+            setLastError(CloudinaryHelper.getErrorMessage(errorCode));
+        }
     }
 
     public UploadStatus getStatus() {

@@ -1,20 +1,21 @@
 package com.cloudinary.android;
 
 import android.content.Context;
-import android.content.res.Resources;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.ProgressCallback;
 import com.cloudinary.android.callback.UploadStatus;
-import com.cloudinary.android.payload.NotFoundException;
+import com.cloudinary.android.payload.FileNotFoundException;
+import com.cloudinary.android.payload.LocalUriNotFoundException;
 import com.cloudinary.android.payload.Payload;
 import com.cloudinary.android.payload.PayloadFactory;
+import com.cloudinary.android.payload.PayloadNotFoundException;
+import com.cloudinary.android.payload.ResourceNotFoundException;
 import com.cloudinary.android.signed.Signature;
 import com.cloudinary.android.signed.SignatureProvider;
 import com.cloudinary.utils.ObjectUtils;
 import com.cloudinary.utils.StringUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -73,7 +74,7 @@ class DefaultRequestProcessor implements RequestProcessor {
             Logger.e(TAG, String.format("Request %s, error loading options.", requestId), e);
         }
 
-        String error = "Unknown error.";
+        int error = CldAndroid.Errors.NO_ERROR;
 
         if (optionsLoadedSuccessfully) {
             if (StringUtils.isNotBlank(uri)) {
@@ -86,29 +87,29 @@ class DefaultRequestProcessor implements RequestProcessor {
                             runningJobs.incrementAndGet();
                             resultData = doProcess(requestId, appContext, options, params, payload);
                             requestResultStatus = SUCCESS;
-                        } catch (NotFoundException e) {
-                            Logger.e(TAG, String.format("NotFoundException for request %s.", requestId), e);
-                            requestResultStatus = FAILURE;
-                            error = "The requested file does not exist."; // REVIEW messages. consider const or resources
-                        } catch (Resources.NotFoundException e) {
-                            Logger.e(TAG, String.format("Resources.NotFoundException for request %s.", requestId), e);
-                            requestResultStatus = FAILURE;
-                            error = "The requested file does not exist.";
                         } catch (FileNotFoundException e) {
                             Logger.e(TAG, String.format("FileNotFoundException for request %s.", requestId), e);
                             requestResultStatus = FAILURE;
-                            error = "The requested file does not exist.";
+                            error = CldAndroid.Errors.FILE_DOES_NOT_EXIST;
+                        } catch (LocalUriNotFoundException e) {
+                            Logger.e(TAG, String.format("LocalUriNotFoundException for request %s.", requestId), e);
+                            requestResultStatus = FAILURE;
+                            error = CldAndroid.Errors.URI_DOES_NOT_EXIST;
+                        } catch (ResourceNotFoundException e) {
+                            Logger.e(TAG, String.format("ResourceNotFoundException for request %s.", requestId), e);
+                            requestResultStatus = FAILURE;
+                            error = CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST;
                         } catch (ErrorRetrievingSignatureException e) {
                             Logger.e(TAG, String.format("Error retrieving signature for request %s.", requestId), e);
                             requestResultStatus = FAILURE;
-                            error = e.getMessage();
+                            error = CldAndroid.Errors.SIGNATURE_FAILURE;
                         } catch (IOException e) {
                             Logger.e(TAG, String.format("IOException for request %s.", requestId), e);
-                            error = String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage());
+                            error = CldAndroid.Errors.NETWORK_ERROR;
                             requestResultStatus = RESCHEDULE;
                         } catch (Exception e) {
                             Logger.e(TAG, String.format("Unexpected exception for request %s.", requestId), e);
-                            error = String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage());
+                            error = CldAndroid.Errors.UNKNOWN_ERROR;
                             requestResultStatus = FAILURE;
                         } finally {
                             runningJobs.decrementAndGet();
@@ -119,17 +120,17 @@ class DefaultRequestProcessor implements RequestProcessor {
                     }
                 } else {
                     Logger.d(TAG, String.format("Failing request %s, payload cannot be loaded.", requestId));
-                    error = "Request payload could not be loaded.";
+                    error = CldAndroid.Errors.PAYLOAD_LOAD_FAILURE;
                     requestResultStatus = FAILURE;
                 }
             } else {
                 requestResultStatus = FAILURE;
-                error = "Request Uri is empty.";
+                error = CldAndroid.Errors.PAYLOAD_EMPTY;
                 Logger.d(TAG, String.format("Failing request %s, Uri is empty.", requestId));
             }
         } else {
             requestResultStatus = FAILURE;
-            error = "Cloud not load request options.";
+            error = CldAndroid.Errors.OPTIONS_FAILURE;
             Logger.d(TAG, String.format("Failing request %s, cannot load options.", requestId));
         }
 
@@ -153,7 +154,7 @@ class DefaultRequestProcessor implements RequestProcessor {
         return requestResultStatus;
     }
 
-    private Map doProcess(final String requestId, Context appContext, Map<String, Object> options, RequestParams params, Payload payload) throws NotFoundException, IOException, ErrorRetrievingSignatureException {
+    private Map doProcess(final String requestId, Context appContext, Map<String, Object> options, RequestParams params, Payload payload) throws PayloadNotFoundException, IOException, ErrorRetrievingSignatureException {
         Logger.d(TAG, String.format("Starting upload for request %s", requestId));
         final long actualTotalBytes = payload.getLength(appContext);
         final long offset = params.getLong("offset", 0);
