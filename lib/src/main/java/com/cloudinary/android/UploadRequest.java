@@ -211,13 +211,13 @@ public class UploadRequest<T extends Payload> {
         }
 
         @Override
-        public void onError(String requestId, String error) {
+        public void onError(String requestId, int error) {
             callback.onError(requestId, error);
             CldAndroid.get().unregisterCallback(this);
         }
 
         @Override
-        public void onReschedule(String requestId, String errorMessage) {
+        public void onReschedule(String requestId, int errorMessage) {
             callback.onReschedule(requestId, errorMessage);
         }
     }
