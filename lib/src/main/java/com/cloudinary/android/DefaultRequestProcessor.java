@@ -5,6 +5,7 @@ import android.content.Context;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.ProgressCallback;
 import com.cloudinary.android.callback.UploadStatus;
+import com.cloudinary.android.payload.EmptyByteArrayException;
 import com.cloudinary.android.payload.FileNotFoundException;
 import com.cloudinary.android.payload.LocalUriNotFoundException;
 import com.cloudinary.android.payload.Payload;
@@ -68,9 +69,7 @@ class DefaultRequestProcessor implements RequestProcessor {
         try {
             options = UploadRequest.decodeOptions(optionsAsString);
             optionsLoadedSuccessfully = true;
-        } catch (IOException e) {
-            Logger.e(TAG, String.format("Request %s, error loading options.", requestId), e);
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             Logger.e(TAG, String.format("Request %s, error loading options.", requestId), e);
         }
 
@@ -99,6 +98,10 @@ class DefaultRequestProcessor implements RequestProcessor {
                             Logger.e(TAG, String.format("ResourceNotFoundException for request %s.", requestId), e);
                             requestResultStatus = FAILURE;
                             error = CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST;
+                        } catch (EmptyByteArrayException e) {
+                            Logger.e(TAG, String.format("EmptyByteArrayException for request %s.", requestId), e);
+                            requestResultStatus = FAILURE;
+                            error = CldAndroid.Errors.BYTE_ARRAY_PAYLOAD_EMPTY;
                         } catch (ErrorRetrievingSignatureException e) {
                             Logger.e(TAG, String.format("Error retrieving signature for request %s.", requestId), e);
                             requestResultStatus = FAILURE;
