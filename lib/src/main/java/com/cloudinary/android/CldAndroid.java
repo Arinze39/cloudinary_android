@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Url;
+import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.cloudinary.android.callback.UploadResult;
 import com.cloudinary.android.callback.UploadStatus;
@@ -81,12 +82,12 @@ public class CldAndroid {
             }
 
             @Override
-            public void onError(String requestId, int error) {
+            public void onError(String requestId, ErrorInfo error) {
                 queueRoomFreed();
             }
 
             @Override
-            public void onReschedule(String requestId, int errorMessage) {
+            public void onReschedule(String requestId, ErrorInfo error) {
                 queueRoomFreed();
             }
         };
@@ -343,18 +344,4 @@ public class CldAndroid {
         return signatureProvider;
     }
 
-    public interface Errors {
-        /**  */
-        int NO_ERROR = 0;
-        int FILE_DOES_NOT_EXIST = 1;
-        int URI_DOES_NOT_EXIST = 2;
-        int RESOURCE_DOES_NOT_EXIST = 3;
-        int SIGNATURE_FAILURE = 4;
-        int NETWORK_ERROR = 5;
-        int UNKNOWN_ERROR = 6;
-        int PAYLOAD_LOAD_FAILURE = 7;
-        int PAYLOAD_EMPTY = 8;
-        int OPTIONS_FAILURE = 9;
-        int BYTE_ARRAY_PAYLOAD_EMPTY = 10;
-    }
 }

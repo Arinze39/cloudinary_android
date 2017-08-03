@@ -3,39 +3,43 @@ package com.cloudinary.android;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 
-import com.cloudinary.android.callback.UploadCallback;
+import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.payload.ByteArrayPayload;
 import com.cloudinary.android.payload.FilePayload;
 import com.cloudinary.android.payload.LocalUriPayload;
 import com.cloudinary.android.payload.ResourcePayload;
-import com.cloudinary.android.signed.Signature;
-import com.cloudinary.android.signed.SignatureProvider;
-import com.cloudinary.utils.ObjectUtils;
 
 import org.awaitility.Awaitility;
 import org.awaitility.Duration;
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+@RunWith(AndroidJUnit4.class)
 public class RequestProcessorTest extends AbstractTest {
+    @Test
+    public void testStuff() {
+        Assert.assertEquals(3, 3);
+    }
 
     /**
      * Centralize processor creation in case we want to test different implementations in the future.
      */
-    private RequestProcessor provideRequestProcessor(DefaultCallbackDispatcher callbackDispatcher) {
+    protected RequestProcessor provideRequestProcessor(DefaultCallbackDispatcher callbackDispatcher) {
         return new DefaultRequestProcessor(callbackDispatcher);
     }
 
     /**
      * Centralize params creation in case we want to test different implementations in the future.
      */
-    private RequestParams provideRequestParams() {
+    protected RequestParams provideRequestParams() {
         TestParams testParams = new TestParams();
         testParams.putString("requestId", UUID.randomUUID().toString());
         return testParams;
@@ -44,25 +48,21 @@ public class RequestProcessorTest extends AbstractTest {
     /**
      * Centralize callback dispatcher creation in case we want to test different implementations in the future.
      */
-    private DefaultCallbackDispatcher provideCallbackDispatcher() {
+    protected DefaultCallbackDispatcher provideCallbackDispatcher() {
         return new DefaultCallbackDispatcher(InstrumentationRegistry.getTargetContext());
     }
 
-    /**
-     * Call init with default parameters that fit most tests.
-     */
-    private void initCldAndroid() {
-        CldAndroid.init(InstrumentationRegistry.getTargetContext(), ObjectUtils.asMap("cloud_name", "cloudName"));
-    }
-
     @Test
-    public void testValidUpload() throws IOException {
-        // no config, takes full credentials from env variable.
-        CldAndroid.init(InstrumentationRegistry.getTargetContext());
-
+    public void testValidUploadWithParams() throws IOException {
         RequestParams params = provideRequestParams();
         params.putString("uri", new FilePayload(assetToFile(TEST_IMAGE).getAbsolutePath()).toUri());
-        params.putString("options", UploadRequest.encodeOptions(new HashMap<String, Object>()));
+        HashMap<String, Object> options = new HashMap<>();
+        // verify that the parameter reaches all the way to the uploader inside:
+        final String id = UUID.randomUUID().toString();
+        options.put("public_id", id);
+        options.put("unsigned", true);
+        options.put("upload_preset", TEST_PRESET);
+        params.putString("options", UploadRequest.encodeOptions(options));
 
         DefaultCallbackDispatcher callbackDispatcher = provideCallbackDispatcher();
         RequestProcessor processor = provideRequestProcessor(callbackDispatcher);
@@ -74,113 +74,90 @@ public class RequestProcessorTest extends AbstractTest {
             @Override
             public Boolean call() throws Exception {
                 return statefulCallback.lastSuccess != null &&
-                        statefulCallback.lastSuccess.containsKey("public_id");
+                        id.equals(statefulCallback.lastSuccess.get("public_id"));
             }
         });
-
     }
 
     @Test
     public void testInvalidOptions() throws IOException {
-        initCldAndroid();
-
         RequestParams params = provideRequestParams();
         params.putString("options", "bad options string");
         params.putString("uri", new FilePayload(assetToFile(TEST_IMAGE).getAbsolutePath()).toUri());
 
-        verifyError(params, CldAndroid.Errors.OPTIONS_FAILURE);
+        verifyError(params, ErrorInfo.OPTIONS_FAILURE);
     }
 
     @Test
     public void testNoPayload() throws IOException {
-        initCldAndroid();
         RequestParams params = provideRequestParams();
 
         params.putString("options", UploadRequest.encodeOptions(new HashMap<String, Object>()));
-        verifyError(params, CldAndroid.Errors.PAYLOAD_EMPTY);
+        verifyError(params, ErrorInfo.PAYLOAD_EMPTY);
     }
 
     @Test
     public void testInvalidPayload() throws IOException {
-        initCldAndroid();
         RequestParams params = provideRequestParams();
 
         params.putString("options", UploadRequest.encodeOptions(new HashMap<String, Object>()));
         params.putString("uri", "bad uri!");
 
-        verifyError(params, CldAndroid.Errors.PAYLOAD_LOAD_FAILURE);
+        verifyError(params, ErrorInfo.PAYLOAD_LOAD_FAILURE);
     }
 
     @Test
     public void testInvalidUriPayload() throws IOException {
-        initCldAndroid();
         RequestParams params = provideRequestParams();
-
 
         params.putString("options", UploadRequest.encodeOptions(new HashMap<String, Object>()));
         params.putString("uri", new LocalUriPayload(Uri.parse("bad uri!")).toUri());
 
-        verifyError(params, CldAndroid.Errors.URI_DOES_NOT_EXIST);
+        verifyError(params, ErrorInfo.URI_DOES_NOT_EXIST);
     }
 
     @Test
     public void testInvalidFilePayload() throws IOException {
-        initCldAndroid();
         RequestParams params = provideRequestParams();
 
 
         params.putString("options", UploadRequest.encodeOptions(new HashMap<String, Object>()));
         params.putString("uri", new FilePayload("bad path!").toUri());
 
-        verifyError(params, CldAndroid.Errors.FILE_DOES_NOT_EXIST);
+        verifyError(params, ErrorInfo.FILE_DOES_NOT_EXIST);
     }
 
     @Test
     public void testInvalidByteArrayPayload() throws IOException {
-        initCldAndroid();
         RequestParams params = provideRequestParams();
 
 
         params.putString("options", UploadRequest.encodeOptions(new HashMap<String, Object>()));
         params.putString("uri", new ByteArrayPayload(new byte[]{}).toUri());
 
-        verifyError(params, CldAndroid.Errors.BYTE_ARRAY_PAYLOAD_EMPTY);
+        verifyError(params, ErrorInfo.BYTE_ARRAY_PAYLOAD_EMPTY);
     }
 
     @Test
     public void testInvalidResourcePayload() throws IOException {
-        initCldAndroid();
         RequestParams params = provideRequestParams();
 
 
         params.putString("options", UploadRequest.encodeOptions(new HashMap<String, Object>()));
         params.putString("uri", new ResourcePayload(-10).toUri());
 
-        verifyError(params, CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST);
+        verifyError(params, ErrorInfo.RESOURCE_DOES_NOT_EXIST);
     }
 
     @Test
     public void testSignatureFailure() throws IOException {
-        // init the library with a bad signature provider
-        CldAndroid.init(InstrumentationRegistry.getTargetContext(), new SignatureProvider() {
-            @Override
-            public Signature provideSignature(Map options) {
-                return null;
-            }
-
-            @Override
-            public String getName() {
-                return null;
-            }
-        }, ObjectUtils.asMap("cloud_name", "cloudName"));
-
         RequestParams params = provideRequestParams();
         HashMap<String, Object> options = new HashMap<>();
 
         params.putString("options", UploadRequest.encodeOptions(options));
         params.putString("uri", new FilePayload(assetToFile(TEST_IMAGE).getAbsolutePath()).toUri());
 
-        verifyError(params, CldAndroid.Errors.SIGNATURE_FAILURE);
+        verifyError(params, ErrorInfo.SIGNATURE_FAILURE);
     }
 
     /**
@@ -199,7 +176,7 @@ public class RequestProcessorTest extends AbstractTest {
         Awaitility.await().atMost(Duration.TWO_SECONDS).until(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                return statefulCallback.lastError == expectedErrorCode;
+                return statefulCallback.lastErrorObject != null && statefulCallback.lastErrorObject.getCode() == expectedErrorCode;
             }
         });
     }
@@ -207,7 +184,7 @@ public class RequestProcessorTest extends AbstractTest {
     /**
      * Bundle based implementation for RequestParams, for testing purposes.
      */
-    private static final class TestParams implements RequestParams {
+    protected static final class TestParams implements RequestParams {
         private final Bundle values = new Bundle();
 
         @Override
@@ -238,39 +215,6 @@ public class RequestProcessorTest extends AbstractTest {
         @Override
         public long getLong(String key, long defaultValue) {
             return values.getLong(key, defaultValue);
-        }
-    }
-
-    /**
-     * Callback implementations that saved the last result
-     */
-    private final static class StatefulCallback implements UploadCallback {
-
-        private Integer lastError = null;
-        private Map lastSuccess = null;
-
-        @Override
-        public void onStart(String requestId) {
-        }
-
-        @Override
-        public void onProgress(String requestId, long bytes, long totalBytes) {
-        }
-
-        @Override
-        public void onSuccess(String requestId, Map resultData) {
-            this.lastSuccess = resultData;
-            this.lastError = null;
-        }
-
-        @Override
-        public void onError(String requestId, int error) {
-            this.lastError = error;
-        }
-
-        @Override
-        public void onReschedule(String requestId, int error) {
-            this.lastError = error;
         }
     }
 }
