@@ -355,5 +355,6 @@ public class CldAndroid {
         int PAYLOAD_LOAD_FAILURE = 7;
         int PAYLOAD_EMPTY = 8;
         int OPTIONS_FAILURE = 9;
+        int BYTE_ARRAY_PAYLOAD_EMPTY = 10;
     }
 }
