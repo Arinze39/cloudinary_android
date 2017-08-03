@@ -6,6 +6,7 @@ import android.net.Uri;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import com.cloudinary.android.CldAndroid;
+import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.sample.R;
 import com.cloudinary.android.sample.app.MainApplication;
 import com.cloudinary.android.sample.app.Utils;
@@ -85,37 +86,37 @@ public class CloudinaryHelper {
         return effects;
     }
 
-    public static String getErrorMessage(int error) {
+    public static String getPrettyErrorMessage(int error) {
         int stringResId;
         switch (error) {
-            case CldAndroid.Errors.NO_ERROR:
+            case ErrorInfo.NO_ERROR:
                 stringResId = R.string.no_error_message;
                 break;
-            case CldAndroid.Errors.FILE_DOES_NOT_EXIST:
+            case ErrorInfo.FILE_DOES_NOT_EXIST:
                 stringResId = R.string.file_does_not_exist;
                 break;
-            case CldAndroid.Errors.NETWORK_ERROR:
+            case ErrorInfo.NETWORK_ERROR:
                 stringResId = R.string.network_error;
                 break;
-            case CldAndroid.Errors.OPTIONS_FAILURE:
+            case ErrorInfo.OPTIONS_FAILURE:
                 stringResId = R.string.options_failure;
                 break;
-            case CldAndroid.Errors.PAYLOAD_EMPTY:
+            case ErrorInfo.PAYLOAD_EMPTY:
                 stringResId = R.string.payload_empty;
                 break;
-            case CldAndroid.Errors.PAYLOAD_LOAD_FAILURE:
+            case ErrorInfo.PAYLOAD_LOAD_FAILURE:
                 stringResId = R.string.payload_could_not_load;
                 break;
-            case CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST:
+            case ErrorInfo.RESOURCE_DOES_NOT_EXIST:
                 stringResId = R.string.resource_does_not_exist;
                 break;
-            case CldAndroid.Errors.SIGNATURE_FAILURE:
+            case ErrorInfo.SIGNATURE_FAILURE:
                 stringResId = R.string.signature_failure;
                 break;
-            case CldAndroid.Errors.URI_DOES_NOT_EXIST:
+            case ErrorInfo.URI_DOES_NOT_EXIST:
                 stringResId = R.string.uri_does_not_exist;
                 break;
-            case CldAndroid.Errors.UNKNOWN_ERROR:
+            case ErrorInfo.UNKNOWN_ERROR:
             default:
                 stringResId = R.string.unknown_error;
         }

@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.ProgressCallback;
+import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadStatus;
 import com.cloudinary.android.payload.EmptyByteArrayException;
 import com.cloudinary.android.payload.FileNotFoundException;
@@ -25,6 +26,7 @@ import static com.cloudinary.Uploader.BUFFER_SIZE;
 import static com.cloudinary.android.callback.UploadStatus.FAILURE;
 import static com.cloudinary.android.callback.UploadStatus.RESCHEDULE;
 import static com.cloudinary.android.callback.UploadStatus.SUCCESS;
+import static java.lang.Boolean.TRUE;
 
 /**
  * {@inheritDoc}
@@ -73,7 +75,7 @@ class DefaultRequestProcessor implements RequestProcessor {
             Logger.e(TAG, String.format("Request %s, error loading options.", requestId), e);
         }
 
-        int error = CldAndroid.Errors.NO_ERROR;
+        ErrorInfo error = null;
 
         if (optionsLoadedSuccessfully) {
             if (StringUtils.isNotBlank(uri)) {
@@ -89,30 +91,30 @@ class DefaultRequestProcessor implements RequestProcessor {
                         } catch (FileNotFoundException e) {
                             Logger.e(TAG, String.format("FileNotFoundException for request %s.", requestId), e);
                             requestResultStatus = FAILURE;
-                            error = CldAndroid.Errors.FILE_DOES_NOT_EXIST;
+                            error = new ErrorInfo(ErrorInfo.FILE_DOES_NOT_EXIST, e.getMessage());
                         } catch (LocalUriNotFoundException e) {
                             Logger.e(TAG, String.format("LocalUriNotFoundException for request %s.", requestId), e);
                             requestResultStatus = FAILURE;
-                            error = CldAndroid.Errors.URI_DOES_NOT_EXIST;
+                            error = new ErrorInfo(ErrorInfo.URI_DOES_NOT_EXIST, e.getMessage());
                         } catch (ResourceNotFoundException e) {
                             Logger.e(TAG, String.format("ResourceNotFoundException for request %s.", requestId), e);
+                            error = new ErrorInfo(ErrorInfo.RESOURCE_DOES_NOT_EXIST, e.getMessage());
                             requestResultStatus = FAILURE;
-                            error = CldAndroid.Errors.RESOURCE_DOES_NOT_EXIST;
                         } catch (EmptyByteArrayException e) {
                             Logger.e(TAG, String.format("EmptyByteArrayException for request %s.", requestId), e);
                             requestResultStatus = FAILURE;
-                            error = CldAndroid.Errors.BYTE_ARRAY_PAYLOAD_EMPTY;
+                            error = new ErrorInfo(ErrorInfo.BYTE_ARRAY_PAYLOAD_EMPTY, e.getMessage());
                         } catch (ErrorRetrievingSignatureException e) {
                             Logger.e(TAG, String.format("Error retrieving signature for request %s.", requestId), e);
                             requestResultStatus = FAILURE;
-                            error = CldAndroid.Errors.SIGNATURE_FAILURE;
+                            error = new ErrorInfo(ErrorInfo.SIGNATURE_FAILURE, e.getMessage());
                         } catch (IOException e) {
                             Logger.e(TAG, String.format("IOException for request %s.", requestId), e);
-                            error = CldAndroid.Errors.NETWORK_ERROR;
+                            error = new ErrorInfo(ErrorInfo.NETWORK_ERROR, e.getMessage());
                             requestResultStatus = RESCHEDULE;
                         } catch (Exception e) {
                             Logger.e(TAG, String.format("Unexpected exception for request %s.", requestId), e);
-                            error = CldAndroid.Errors.UNKNOWN_ERROR;
+                            error = new ErrorInfo(ErrorInfo.UNKNOWN_ERROR, e.getMessage());
                             requestResultStatus = FAILURE;
                         } finally {
                             runningJobs.decrementAndGet();
@@ -123,17 +125,17 @@ class DefaultRequestProcessor implements RequestProcessor {
                     }
                 } else {
                     Logger.d(TAG, String.format("Failing request %s, payload cannot be loaded.", requestId));
-                    error = CldAndroid.Errors.PAYLOAD_LOAD_FAILURE;
+                    error = new ErrorInfo(ErrorInfo.PAYLOAD_LOAD_FAILURE, "Request payload could not be loaded.");
                     requestResultStatus = FAILURE;
                 }
             } else {
                 requestResultStatus = FAILURE;
-                error = CldAndroid.Errors.PAYLOAD_EMPTY;
+                error = new ErrorInfo(ErrorInfo.PAYLOAD_EMPTY, "Request payload is empty.");
                 Logger.d(TAG, String.format("Failing request %s, Uri is empty.", requestId));
             }
         } else {
             requestResultStatus = FAILURE;
-            error = CldAndroid.Errors.OPTIONS_FAILURE;
+            error = new ErrorInfo(ErrorInfo.OPTIONS_FAILURE, "Options could not be loaded.");
             Logger.d(TAG, String.format("Failing request %s, cannot load options.", requestId));
         }
 
@@ -159,6 +161,7 @@ class DefaultRequestProcessor implements RequestProcessor {
 
     private Map doProcess(final String requestId, Context appContext, Map<String, Object> options, RequestParams params, Payload payload) throws PayloadNotFoundException, IOException, ErrorRetrievingSignatureException {
         Logger.d(TAG, String.format("Starting upload for request %s", requestId));
+        Object preparedPayload = payload.prepare(appContext);
         final long actualTotalBytes = payload.getLength(appContext);
         final long offset = params.getLong("offset", 0);
         final int bufferSize;
@@ -173,8 +176,8 @@ class DefaultRequestProcessor implements RequestProcessor {
             uploadUniqueId = new Cloudinary().randomPublicId();
         }
 
-        // check credentials/signature
-        if (!CldAndroid.get().hasCredentials()) {
+        // if there are no credentials and the request is NOT unsigned - activate the signature provider (if present).
+        if (!CldAndroid.get().hasCredentials() && !TRUE.equals(options.get("unsigned"))) {
             SignatureProvider signatureProvider = CldAndroid.get().getSignatureProvider();
             if (signatureProvider != null) {
                 try {
@@ -191,7 +194,7 @@ class DefaultRequestProcessor implements RequestProcessor {
         final ProcessorCallback processorCallback = new ProcessorCallback(actualTotalBytes, offset, callbackDispatcher, requestId);
 
         try {
-            return CldAndroid.get().getCloudinary().uploader().uploadLarge(payload.prepare(appContext), options, bufferSize, offset, uploadUniqueId, processorCallback);
+            return CldAndroid.get().getCloudinary().uploader().uploadLarge(preparedPayload, options, bufferSize, offset, uploadUniqueId, processorCallback);
         } finally {
             // save data into persisted request params to enable resuming later on
             params.putInt("original_buffer_size", bufferSize);

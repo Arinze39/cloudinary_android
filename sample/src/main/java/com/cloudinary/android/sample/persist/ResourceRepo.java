@@ -1,6 +1,6 @@
 package com.cloudinary.android.sample.persist;
 
-import com.cloudinary.android.CldAndroid;
+import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.sample.app.MainApplication;
 import com.cloudinary.android.sample.model.Resource;
 
@@ -38,7 +38,7 @@ public class ResourceRepo {
     }
 
     public Resource resourceUploaded(String requestId, String publicId, String deleteToken) {
-        helper.setUploadResultParams(requestId, publicId, deleteToken, Resource.UploadStatus.UPLOADED, CldAndroid.Errors.NO_ERROR);
+        helper.setUploadResultParams(requestId, publicId, deleteToken, Resource.UploadStatus.UPLOADED, ErrorInfo.NO_ERROR);
         return helper.findByRequestId(requestId);
     }
 
@@ -50,7 +50,7 @@ public class ResourceRepo {
     }
 
     public Resource resourceUploading(String requestId) {
-        helper.setUploadResultParams(requestId, null, null, Resource.UploadStatus.UPLOADING, CldAndroid.Errors.NO_ERROR);
+        helper.setUploadResultParams(requestId, null, null, Resource.UploadStatus.UPLOADING, ErrorInfo.NO_ERROR);
         return helper.findByRequestId(requestId);
     }
 

@@ -31,16 +31,16 @@ public interface UploadCallback {
     /**
      * Called when a request encounters an error.
      * @param requestId Id of the request sending this callback.
-     * @param error Error code. See {@link com.cloudinary.android.CldAndroid.Errors}
+     * @param error Error object containing description and code.
      */
-    void onError(String requestId, int error);
+    void onError(String requestId, ErrorInfo error);
 
     /**
      * Called when a request fails with a recoverable error and is rescheduled to a later time.
      * This is useful to update UI (e.g hide progress notifications), otherwise this callback can be ignored.
      * @param requestId Id of the request sending this callback.
-     * @param error Error code. See {@link com.cloudinary.android.CldAndroid.Errors}
+     * @param error Error object containing technical description and code.
      */
-    void onReschedule(String requestId, int error);
+    void onReschedule(String requestId, ErrorInfo error);
 }
 
