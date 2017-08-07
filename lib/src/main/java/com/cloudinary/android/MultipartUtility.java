@@ -2,8 +2,6 @@ package com.cloudinary.android;
 
 import android.os.Build;
 
-import com.cloudinary.Cloudinary;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,7 +21,7 @@ import java.util.Map;
  * @author Cloudinary
  */
 public class MultipartUtility {
-    public final static String USER_AGENT = "CloudinaryAndroid/" + Cloudinary.VERSION + " (" + Build.VERSION.RELEASE + "; " + Build.MODEL + " Build/" + Build.DISPLAY;
+    public final static String USER_AGENT = "CloudinaryAndroid/" + MediaManager.VERSION + " (" + Build.VERSION.RELEASE + "; " + Build.MODEL + " Build/" + Build.DISPLAY;
     private static final String LINE_FEED = "\r\n";
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
     private final String boundary;
